@@ -5,7 +5,7 @@ set -e
 
 MAIN_DIR="syncro"
 MAIN_REPO_URL=git-rts@gitlab.mpi-sws.org:FP/semantics-code.git
-MAIN_BRANCH="main"
+MAIN_BRANCH="inline-solutions"
 
 
 #### UTILITIES ###########################################################
@@ -49,7 +49,7 @@ find theories -name '*_sol.v' -type f -exec rm {} \;
 find theories -type d -name '*_sol' -type d -prune -exec rm -rf {} \;
 
 # remove solution-only segments and uncomment exercise-only segments
-find theories -name '*.v' -type f -exec perl -0777 -i -p -e 's/(.*)\(\*[[:blank:]]*<solution-only>[[:blank:]]*\*\)(:?[[:blank:]]*[[:space:]])*(?:\n|.)*\(\*[[:blank:]]*<\/solution-only>[[:blank:]]*\*\)(.*)\n?/$1$3/p; s/(.*)\(\*.*<exercise-only>(:?[[:blank:]]*[[:space:]])*((:?\n|.)*)<\/exercise-only>(.*)\*\).*/$1$2$3/p' {} \;
+find theories -name '*.v' -type f -exec perl -0777 -i -p -e 's/(.*)\(\*[[:blank:]]*<solution-only>[[:blank:]]*\*\)(:?[[:blank:]]*[[:space:]])*(?:\n|.)*?\(\*[[:blank:]]*<\/solution-only>[[:blank:]]*\*\)(.*)\n?/$1$3/g; s/(.*)\(\*.*<exercise-only>(:?[[:blank:]]*[[:space:]])*((:?\n|.)*?)<\/exercise-only>(.*)\*\).*/$1$2$3/g; s/(.*)\(\*[[:blank:]]*<solution>[[:blank:]]*\*\)(:?[[:blank:]]*[[:space:]])*(?:\n|.)*?\(\*[[:blank:]]*<\/solution>[[:blank:]]*\*\)(.*)\n?/$1\  (\*FIXME\*\)\nAdmitted\.\n$3/g' {} \;
 
 
 cd ..
