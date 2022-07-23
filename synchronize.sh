@@ -7,6 +7,9 @@ MAIN_DIR="syncro"
 MAIN_REPO_URL=git-rts@gitlab.mpi-sws.org:FP/semantics-code.git
 MAIN_BRANCH="inline-solutions"
 
+# The text to replace <solution> environments with.
+# The regex variable $1 is bound to the current indentation.
+DEFAULT_TEMPLATE_TEXT="\$1  \(\* FIXME: exercise \*\)\n\$1Admitted\.\n"
 
 #### UTILITIES ###########################################################
 
@@ -48,8 +51,20 @@ find theories -name '*_sol.v' -type f -exec rm {} \;
 # remove directories ending with _sol
 find theories -type d -name '*_sol' -type d -prune -exec rm -rf {} \;
 
-# remove solution-only segments and uncomment exercise-only segments
-find theories -name '*.v' -type f -exec perl -0777 -i -p -e 's/(.*)\(\*[[:blank:]]*<solution-only>[[:blank:]]*\*\)(:?[[:blank:]]*[[:space:]])*(?:\n|.)*?\(\*[[:blank:]]*<\/solution-only>[[:blank:]]*\*\)(.*)\n?/$1$3/g; s/(.*)\(\*.*<exercise-only>(:?[[:blank:]]*[[:space:]])*((:?\n|.)*?)<\/exercise-only>(.*)\*\).*/$1$2$3/g; s/(.*)\(\*[[:blank:]]*<solution>[[:blank:]]*\*\)(:?[[:blank:]]*[[:space:]])*(?:\n|.)*?\(\*[[:blank:]]*<\/solution>[[:blank:]]*\*\)(.*)\n?/$1\  (\*FIXME\*\)\nAdmitted\.\n$3/g' {} \;
+# assemble the regex for generating the exercises
+# note: we need to escape $ for variables bound by the regex so bash doesn't replace them
+
+# remove segments '(* <solution-only> *) .... (* </solution-only> *)'
+remove_solution_regex="s/(.*)\(\*[[:blank:]]*<solution-only>[[:blank:]]*\*\)(:?[[:blank:]]*[[:space:]])*(?:\n|.)*?\(\*[[:blank:]]*<\/solution-only>[[:blank:]]*\*\)(.*)\n?/\$1\$3/g"
+# replace segments '(* <exercise-only> my_exercise </exercise-only> *)' by 'my_exercise'
+put_exercise_regex="s/(.*)\(\*.*<exercise-only>(:?[[:blank:]]*[[:space:]])*((:?\n|.)*?)<\/exercise-only>(.*)\*\).*/\$1\$2\$3/g"
+# Replace segments '(* <solution> *) ... (* <solution> *) by the contents of DEFAULT_TEMPLATE_TEXT
+# For proper indentation, this assumes that the leading '(* <solution> *)' is on its own line, and aligned to the current base indentation (e.g. aligned with 'Proof.').
+# DEFAULT_TEMPLATE_TEXT has access to this indentation at regex variable $1
+replace_solution_regex="s/(.*)\(\*[[:blank:]]*<solution>[[:blank:]]*\*\)(:?[[:blank:]]*[[:space:]])*(?:\n|.)*?\(\*[[:blank:]]*<\/solution>[[:blank:]]*\*\)(.*)\n?/${DEFAULT_TEMPLATE_TEXT}\$3/g"
+# assmble the full regex doing all of these things
+full_regex="${remove_solution_regex}; ${put_exercise_regex}; ${replace_solution_regex}"
+find theories -name '*.v' -type f -exec perl -0777 -i -p -e "$full_regex" {} \;
 
 
 cd ..
