@@ -51,6 +51,9 @@ find theories -name '*_sol.v' -type f -exec rm {} \;
 # remove directories ending with _sol
 find theories -type d -name '*_sol' -type d -prune -exec rm -rf {} \;
 
+# remove solution files from CoqProject
+perl -0777 -i -p -e 's/.*_sol\/.*\n//g; s/.*_sol\.v\n//g' _CoqProject
+
 # assemble the regex for generating the exercises
 # note: we need to escape $ for variables bound by the regex so bash doesn't replace them
 

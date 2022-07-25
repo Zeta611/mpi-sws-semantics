@@ -5,7 +5,7 @@ From semantics.axiomatic Require Export hoare_lib.
 
 Import hoare.
 Implicit Types
-  (P Q R: iProp)
+  (P Q: iProp)
   (φ ψ: Prop)
   (e: expr)
   (v: val).
@@ -99,6 +99,15 @@ Proof.
   intros H. eapply hoare_con; last apply hoare_value.
   - apply H.
   - eauto.
+Qed.
+
+Lemma hoare_value' P v :
+  {{ P }} v {{ w, P ∗ ⌜w = v⌝}}.
+Proof.
+  eapply hoare_con; last apply hoare_value with (Φ := (λ v', P ∗ ⌜v' = v⌝)%I).
+  - etrans; first apply ent_sep_true. rewrite ent_sep_comm. apply ent_sep_split; first done.
+    by apply ent_prove_pure.
+  - done.
 Qed.
 
 Lemma hoare_rec P Φ f x e v:
@@ -388,7 +397,41 @@ Definition fac : val :=
     if: "n" = #0 then #1
     else "n" * "fac" ("n" - #1).
 
-(** You may want to add intermediate lemmas, similar to the proof for [fib]. *)
+Lemma fac_zero :
+  {{ True }} fac #0 {{ v, ⌜v = #1⌝ }}.
+Proof.
+  unfold fac. apply hoare_rec. simpl.
+  eapply hoare_pure_steps.
+  { econstructor 2.
+    { eapply pure_step_fill with (K := [IfCtx _ _]). by apply pure_step_eq. }
+    simpl. econstructor 2. { apply pure_step_if_true. }
+    reflexivity.
+  }
+  eapply hoare_value_con. by apply ent_prove_pure.
+Qed.
+
+Lemma fac_succ (n m : Z) :
+  {{ True }} fac #(n - 1) {{ v, ⌜v = #m⌝ }} →
+  {{ ⌜(n > 0)%Z⌝ }} fac #n {{ v, ⌜v = #(n * m)⌝ }}.
+Proof.
+  intros Hs. unfold fac. apply hoare_rec. simpl.
+  apply hoare_pure_pre. intros Hn.
+  eapply hoare_pure_steps.
+  { econstructor 2.
+    { eapply pure_step_fill with (K := [IfCtx _ _]).
+      apply pure_step_neq. lia. }
+    simpl. econstructor 2. { apply pure_step_if_false. }
+    fold fac. econstructor 2.
+    { eapply pure_step_fill with (K := [AppRCtx _; BinOpRCtx _ _]).
+      apply pure_step_sub.
+    }
+    simpl. reflexivity.
+  }
+  eapply hoare_bind with (K := [BinOpRCtx _ _]). { apply Hs. }
+  intros v. apply hoare_pure_pre. intros ->.
+  simpl. eapply hoare_pure_step. { apply pure_step_mul. }
+  eapply hoare_value_con. by apply ent_prove_pure.
+Qed.
 
 Fixpoint Fac (n : nat) :=
   match n with
@@ -410,16 +453,7 @@ Check ent_sep_assoc.
 Check ent_pointsto_sep.
 Check ent_exists_sep.
 
-Lemma hoare_value' P v :
-  {{ P }} v {{ w, P ∗ ⌜w = v⌝}}.
-Proof.
-  eapply hoare_con; last apply hoare_value with (Φ := (λ v', P ∗ ⌜v' = v⌝)%I).
-  - etrans; first apply ent_sep_true. rewrite ent_sep_comm. apply ent_sep_split; first done.
-    by apply ent_prove_pure.
-  - done.
-Qed.
-
-(** Note: the separating conjunction can be typed with `\sep` *)
+(* Note: the separating conjunction can be typed with `\sep` *)
 
 
 Lemma ent_pointsto_disj l l' v w :
@@ -471,8 +505,8 @@ Definition cycle l := chain l l.
 Lemma chain_cycle l r :
   chain l r ∗ chain r l ⊢ cycle l.
 Proof.
-  (* FIXME: exercise *)
-Admitted.
+  apply chain_trans.
+Qed.
 
 
 (** New Hoare rules *)
@@ -481,7 +515,6 @@ Check hoare_new.
 Check hoare_store.
 Check hoare_load.
 
-(** A convenient rule for reasoning in Coq. *)
 Lemma hoare_pure_pre_sep_l (ϕ : Prop) Q Φ e :
   (ϕ → {{ Q }} e {{ Φ }}) →
   {{ ⌜ϕ⌝ ∗ Q }} e {{ Φ }}.
@@ -495,7 +528,7 @@ Proof.
   - done.
 Qed.
 
-(** Enables rewriting with equivalences ⊣⊢ in pre/post condition *)
+(* Enables rewriting with equivalences ⊣⊢ in pre/post condition *)
 Instance hoare_proper :
   Proper (equiv ==> eq ==> (pointwise_relation val (⊢)) ==> impl) hoare.
 Proof.
@@ -571,6 +604,8 @@ Lemma swap_correct (l r: loc) (v w: val):
 Proof.
   (* FIXME: exercise *)
 Admitted.
+
+
 
 (** ** Case study: lists *)
 Fixpoint is_ll (xs : list val) (v : val) : iProp :=
@@ -677,6 +712,7 @@ Proof.
     apply ent_sep_split; reflexivity.
 Qed.
 
+(** Exercise: linked lists *)
 Lemma new_ll_correct :
   {{ True }} new_ll #() {{ v, is_ll [] v }}.
 Proof.
@@ -695,11 +731,14 @@ Proof.
   (* FIXME: exercise *)
 Admitted.
 
+
 Lemma tail_ll_correct v x xs :
   {{ is_ll (x :: xs) v }} tail_ll v {{ w, is_ll xs w }}.
 Proof.
   (* FIXME: exercise *)
 Admitted.
+
+
 
 Lemma len_ll_correct v xs :
   {{ is_ll xs v }} len_ll v {{ w, ⌜w = #(length xs)⌝ ∗ is_ll xs v }}.
@@ -707,9 +746,11 @@ Proof.
   (* FIXME: exercise *)
 Admitted.
 
+
 (** Exercise: Prove your strengthened specification for [tail]. *)
 Lemma tail_ll_strengthened v x xs :
   {{ is_ll (x :: xs) v }} tail_ll v {{ w, False (* FIXME *) }}.
 Proof.
   (* FIXME: exercise *)
 Abort.
+

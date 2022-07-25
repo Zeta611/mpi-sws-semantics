@@ -20,7 +20,6 @@ theories/stlc/untyped.v
 theories/stlc/types.v
 theories/stlc/logrel.v
 theories/stlc/parallel_subst.v
-theories/stlc/cbn_logrel_sol.v
 
 # Extended STLC
 theories/stlc_extended/lang.v
@@ -30,12 +29,6 @@ theories/stlc_extended/bigstep.v
 theories/stlc_extended/parallel_subst.v
 theories/stlc_extended/logrel.v
 
-theories/stlc_extended_sol/lang.v
-theories/stlc_extended_sol/notation.v
-theories/stlc_extended_sol/types.v
-theories/stlc_extended_sol/bigstep.v
-theories/stlc_extended_sol/parallel_subst.v
-theories/stlc_extended_sol/logrel.v
 
 
 # System F
@@ -51,35 +44,27 @@ theories/systemf/free_theorems.v
 theories/systemf/binary_logrel.v
 theories/systemf/existential_invariants.v
 
-theories/systemf/logrel_sol.v
-theories/systemf/binary_logrel_sol.v
-theories/systemf/types_sol.v
 
 # SystemF-Mu
 theories/systemf_mu/lang.v
 theories/systemf_mu/notation.v
 theories/systemf_mu/types.v
-theories/systemf_mu/types_sol.v
 theories/systemf_mu/tactics.v
 theories/systemf_mu/pure.v
 theories/systemf_mu/untyped_encoding.v
 theories/systemf_mu/parallel_subst.v
 theories/systemf_mu/logrel.v
 theories/systemf_mu/z_combinator.v
-theories/systemf_mu/logrel_sol.v
-theories/systemf_mu/pure_sol.v
 
 # SystemF + Mu + State
 theories/systemf_mu_state/locations.v
 theories/systemf_mu_state/lang.v
 theories/systemf_mu_state/notation.v
 theories/systemf_mu_state/types.v
-theories/systemf_mu_state/types_sol.v
 theories/systemf_mu_state/tactics.v
 theories/systemf_mu_state/execution.v
 theories/systemf_mu_state/parallel_subst.v
 theories/systemf_mu_state/logrel.v
-theories/systemf_mu_state/logrel_sol.v
 theories/systemf_mu_state/mutbit.v
 
 
@@ -102,9 +87,6 @@ theories/axiomatic/hoare_lib.v
 theories/axiomatic/hoare.v
 theories/axiomatic/ipm.v
 theories/axiomatic/later_loeb.v
-theories/axiomatic/ipm_sol.v
-theories/axiomatic/hoare_sol.v
-theories/axiomatic/later_loeb_sol.v
 
 theories/axiomatic/invariant_lib.v
 # logrel
@@ -115,14 +97,11 @@ theories/axiomatic/logrel/logrel.v
 theories/axiomatic/logrel/adequacy.v
 theories/axiomatic/logrel/ghost_state_lib.v
 theories/axiomatic/logrel/ghost_state.v
-theories/axiomatic/logrel/logrel_sol.v
-theories/axiomatic/logrel/ghost_state_sol.v
 
 
 # resources
 theories/axiomatic/ra_lib.v
 #theories/axiomatic/resource_algebras.v
-theories/axiomatic/resource_algebras_sol.v
 
 theories/axiomatic/fupd.v
 
@@ -144,30 +123,20 @@ theories/axiomatic/concurrent_logrel/syntactic.v
 theories/axiomatic/concurrent_logrel/logrel.v
 theories/axiomatic/concurrent_logrel/adequacy.v
 
-theories/axiomatic/concurrency_sol.v
-theories/axiomatic/concurrent_logrel/logrel_sol.v
 
 
 # By removing the # below, you can add the exercise sheets to make
 # theories/warmup/sheet0.v
-# theories/warmup/sheet0_sol.v
 
 #theories/stlc/exercises01.v
-#theories/stlc/exercises01_sol.v
 
 #theories/stlc/exercises02.v
 #
 #theories/systemf/exercises03.v
-#theories/systemf/exercises03_sol.v
 #
 #
 #theories/stlc/cbn_logrel.v
 #theories/systemf/exercices04.v
-#theories/systemf/exercises04_sol.v
 #theories/systemf/exercises05.v
-#theories/systemf/exercises05_sol.v
 #theories/systemf_mu/exercises06.v
-#theories/systemf_mu/exercises06_sol.v
 #theories/systemf_mu_state/exercises07.v
-#theories/systemf_mu_state/exercises07_sol.v
-#theories/axiomatic/hoare_sol.v

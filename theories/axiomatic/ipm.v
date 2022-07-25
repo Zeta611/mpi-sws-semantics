@@ -5,7 +5,6 @@ From semantics.axiomatic.heap_lang Require Import adequacy proofmode primitive_l
 From semantics.axiomatic Require Import hoare_lib.
 From semantics.axiomatic.program_logic Require Import notation.
 
-
 (** ** Magic is in the air *)
 Import hoare.
 Check ent_wand_intro.
@@ -26,22 +25,24 @@ Qed.
 Lemma ent_carry_res P Q :
   P ⊢ Q -∗ P ∗ Q.
 Proof.
-  (* FIXME: exercise, don't use the IPM *)
+  (* don't use the IPM *) 
+  (* FIXME: exercise *)
 Admitted.
+
 
 Lemma ent_comm_premise P Q R :
   (Q -∗ P -∗ R) ⊢ P -∗ Q -∗ R.
 Proof.
-  (* FIXME: exercise, don't use the IPM *)
+  (* don't use the IPM *) 
+  (* FIXME: exercise *)
 Admitted.
 
 Lemma ent_sep_or_disj2 P Q R :
   (P ∨ R) ∗ (Q ∨ R) ⊢ (P ∗ Q) ∨ R.
 Proof.
-  (* FIXME: exercise, don't use the IPM *)
+  (* don't use the IPM *) 
+  (* FIXME: exercise *)
 Admitted.
-
-
 End primitive.
 
 (** ** Using the IPM *)
@@ -55,7 +56,7 @@ Lemma or_elim P Q R:
   (Q ⊢ R) →
   (P ∨ Q) ⊢ R.
 Proof.
-  iIntros (H1 H2) "[HP | HQ]".
+  iIntros (H1 H2) "[P|Q]".
   - by iApply H1.
   - by iApply H2.
 Qed.
@@ -239,7 +240,6 @@ Proof.
   iApply ("Hn" $! 42 with "[//]").
 Abort.
 
-
 Section without_ipm.
   (** Prove the following entailments without using the IPM. *)
 
@@ -274,13 +274,11 @@ Proof.
   (* FIXME: exercise *)
 Admitted.
 
-
 Lemma ent_lem3_ipm P Q R :
   (P ∨ Q) ⊢ R -∗ (P ∗ R) ∨ (Q ∗ R).
 Proof.
   (* FIXME: exercise *)
 Admitted.
-
 
 
 (** Weakest precondition rules *)
@@ -304,30 +302,33 @@ Qed.
 
 Print hoare.
 (** We can re-derive the Hoare rules from the weakest pre rules. *)
-
 Lemma hoare_frame' P R Φ e :
   {{ P }} e {{ Φ }} →
   {{ P ∗ R }} e {{ v, Φ v ∗ R }}.
 Proof.
-  (* FIXME: exercise, don't use the IPM *)
+  (* don't use the IPM *) 
+  (* FIXME: exercise *)
 Admitted.
 
 Lemma hoare_load l v :
   {{ l ↦ v }} !#l {{ w, ⌜w = v⌝ ∗ l ↦ v }}.
 Proof.
-  (* FIXME: exercise, don't ues the IPM *)
+  (* don't use the IPM *) 
+  (* FIXME: exercise *)
 Admitted.
 
 Lemma hoare_store l (v w : val) :
   {{ l ↦ v }} #l <- w {{ _, l ↦ w }}.
 Proof.
-  (* FIXME: exercise, don't use the IPM *)
+  (* don't use the IPM *) 
+  (* FIXME: exercise *)
 Admitted.
 
 Lemma hoare_new (v : val) :
   {{ True }} ref v {{ w, ∃ l : loc, ⌜w = #l⌝ ∗ l ↦ v }}.
 Proof.
-  (* FIXME: exercise, don't use the IPM *)
+  (* don't use the IPM *) 
+  (* FIXME: exercise *)
 Admitted.
 
 
@@ -391,31 +392,36 @@ Qed.
 Lemma new_ll_correct :
   {{ True }} new_ll #() {{ v, is_ll [] v }}.
 Proof.
-  (* FIXME: exercise, use the IPM *)
+  (* don't use the IPM *) 
+  (* FIXME: exercise *)
 Admitted.
 
 Lemma cons_ll_correct (v x : val) xs :
   {{ is_ll xs v }} cons_ll x v {{ u, is_ll (x :: xs) u }}.
 Proof.
-  (* FIXME: exercise, use the IPM *)
+  (* don't use the IPM *) 
+  (* FIXME: exercise *)
 Admitted.
 
 Lemma head_ll_correct (v x : val) xs :
   {{ is_ll (x :: xs) v }} head_ll v {{ w, ⌜w = x⌝ }}.
 Proof.
-  (* FIXME: exercise, use the IPM *)
+  (* don't use the IPM *) 
+  (* FIXME: exercise *)
 Admitted.
 
 Lemma tail_ll_correct v x xs :
   {{ is_ll (x :: xs) v }} tail_ll v {{ w, is_ll xs w }}.
 Proof.
-  (* FIXME: exercise, use the IPM *)
+  (* don't use the IPM *) 
+  (* FIXME: exercise *)
 Admitted.
 
 Lemma len_ll_correct v xs :
   {{ is_ll xs v }} len_ll v {{ w, ⌜w = #(length xs)⌝ ∗ is_ll xs v }}.
 Proof.
-  (* FIXME: exercise, use the IPM *)
+  (* don't use the IPM *) 
+  (* FIXME: exercise *)
 Admitted.
 
 
@@ -432,7 +438,8 @@ Check ent_pers_exists.
 Lemma ent_pers_dup' P :
   □ P ⊢ (□ P) ∗ (□ P).
 Proof.
-  (* FIXME: exercise, don't use the IPM *)
+  (* don't use the IPM *) 
+  (* FIXME: exercise *)
 Admitted.
 
 
@@ -460,7 +467,6 @@ Abort.
 
 (** We can rederive the previous rules for external Hoare triples. *)
 Section hoare_external.
-  (** TODO: this is an exercise *)
   Definition hoare_ext (P : iProp) (e : expr) (Φ : val → iProp) : Prop :=
     True ⊢ {{ P }} e {{ Φ }}.
 
@@ -515,8 +521,8 @@ Section hoare_external.
     {{ P }} e2 {{ Ψ }}e →
     {{ P }} e1 {{ Ψ }}e.
   Proof.
-    (* FIXME: exercise *)
-  Admitted.
+      (* FIXME: exercise *)
+    Admitted.
 
   Lemma hoare_ext_new v :
     {{ True }} ref (Val v) {{ w, ∃ l : loc, ⌜w = #l⌝ ∗ l ↦ v }}e.
@@ -645,5 +651,6 @@ Lemma lookup_ll_unsafe_correct xs lv (n : nat) :
       lookup_ll_unsafe lv #n
     {{ v, ∃ (l : loc) next, ⌜v = #l⌝ ∗ l ↦ (xs !!! n, next) ∗ (∀ w', l ↦ (w', next) -∗ is_ll (<[n := w']> xs) lv) }}.
 Proof.
-  (* FIXME: exercise, derive this from [lookup_ll_correct] *)
+  (* derive this from [lookup_ll_correct] *)
+  (* FIXME: exercise *)
 Admitted.
