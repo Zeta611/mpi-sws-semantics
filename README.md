@@ -1,21 +1,14 @@
 # Coq development for the Semantics course at Saarland University
 
-This repository contains the Coq code for the Semantics course.
-Over the course of the semester, we gradually provide prepared templates.
+This repository contains the Coq code for the Semantics course taught by Derek Dreyer at Saarland University.
 
 ## Installation Instructions
 
-
-
 ### Windows
-Unfortunately, Windows does not support the libraries we use for the course very well. If you can use one of the other operating systems (macOS or Linux), we recommend you do so and follow the instructions below. Otherwise, you can use the VM that can be downloaded from [our CMS](https://cms.sic.saarland/semantics_ws2122/).
+Unfortunately, Windows does not support the libraries we use for the course very well. If you can use one of the other operating systems (macOS or Linux), we recommend you do so and follow the instructions below.
+Otherwise, you can either use Windows's WSL (Windows Subsystem for Linux) or a VM.
 
-#### VM
-The VM, downloadable from [our CMS](https://cms.sic.saarland/semantics_ws2122/), can be imported into VirtualBox (version 6.0 or newer is recommended). The virtual machine is based on Arch Linux and contains a pre-configured Coq setup with CoqIDE. This repository has already been cloned to its Desktop.
-
-The default user and password are `vagrant`. 
-Depending on your available system resources, you may want to increase the default amount of RAM and the number of CPU cores in VirtualBox.
-
+TODO: put instructions for WSL here.
 
 ### Linux/macOS
 
@@ -39,7 +32,7 @@ To do so, please execute the following instructions:
 cd semantics-code
 
 # we create a new "switch", where we will install the dependencies
-opam switch create semantics ocaml-base-compiler.4.11.2
+opam switch create semantics ocaml-base-compiler.4.14.0
 eval $(opam env)
 opam switch link semantics .
 
@@ -57,8 +50,10 @@ Congratulations, you have now installed all the dependencies and you can start t
 
 ## Using the Coq code
 
-In this repository, you will find all the files from the lecture and templates for your exercise sheets. We will add new files (and solutions)
-each week and you can get them by pulling from the repository.
+In this repository, you will find all the files from the lecture and templates for exercises.
+We usually make these files available over the course of the semester, together with exercise sheets.
+All exercises are also present in the lecture notes.
+In the file `STRUCTURE.md`, you can find a rough mapping of chapters in the lecture notes to the Coq code.
 
 The Coq code is organized in multiple folders and multiple files. To compile, please execute:
 
@@ -74,7 +69,7 @@ make
 
 To edit the Coq code and complete the exercises, you will need an editor.
 There are a number of editors and editor extensions for working with Coq code.
-We recommend one of the following three options:
+We recommend one of the following four options:
 
 - **VS Coq** VSCoq is an extension of the editor [VS Code](https://code.visualstudio.com). Download [the extension](https://github.com/coq-community/vscoq) and change the the following setting in VS Code:
 
@@ -89,4 +84,4 @@ Change `Coqtop: Bin Path` to `~/.opam/semantics/bin/`.
 
 **NOTE** Many of the Coq files use unicode notation for symbols. For example,
 instead of writing `nat -> nat -> nat`, we typically write `nat → nat → nat`.
-You can find our [here how to configure them for your editor](https://gitlab.mpi-sws.org/iris/iris/-/blob/master/docs/editor.md).
+You can find out [here how to configure them for your editor](https://gitlab.mpi-sws.org/iris/iris/-/blob/master/docs/editor.md).

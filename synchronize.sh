@@ -5,7 +5,7 @@ set -e
 
 MAIN_DIR="syncro"
 MAIN_REPO_URL=git-rts@gitlab.mpi-sws.org:FP/semantics-code.git
-MAIN_BRANCH="inline-solutions"
+MAIN_BRANCH="main"
 
 # The text to replace <solution> environments with.
 # The regex variable $1 is bound to the current indentation.
