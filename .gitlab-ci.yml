@@ -20,7 +20,7 @@ variables:
     paths:
     - _opam/
   only:
-  - new/@FP/semantics-course
+  - /^new/@FP/semantics-course
   - /^ci/@FP/semantics-course
   except:
   - triggers
