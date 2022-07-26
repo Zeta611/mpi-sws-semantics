@@ -1,4 +1,6 @@
--Q theories semantics
+-Q theories/lib semantics.lib
+-Q theories/program_logics  semantics.pl
+-Q theories/type_systems semantics.ts
 # We sometimes want to locally override notation, and there is no good way to do that with scopes.
 -arg -w -arg -notation-overridden
 # Cannot use non-canonical projections as it causes massive unification failures
@@ -14,129 +16,112 @@ theories/lib/debruijn.v
 theories/lib/facts.v
 
 # STLC
-theories/stlc/lang.v
-theories/stlc/notation.v
-theories/stlc/untyped.v
-theories/stlc/types.v
-theories/stlc/logrel.v
-theories/stlc/parallel_subst.v
+theories/type_systems/stlc/lang.v
+theories/type_systems/stlc/notation.v
+theories/type_systems/stlc/untyped.v
+theories/type_systems/stlc/types.v
+theories/type_systems/stlc/logrel.v
+theories/type_systems/stlc/parallel_subst.v
 
 # Extended STLC
-theories/stlc_extended/lang.v
-theories/stlc_extended/notation.v
-theories/stlc_extended/types.v
-theories/stlc_extended/bigstep.v
-theories/stlc_extended/parallel_subst.v
-theories/stlc_extended/logrel.v
+theories/type_systems/stlc_extended/lang.v
+theories/type_systems/stlc_extended/notation.v
+theories/type_systems/stlc_extended/types.v
+theories/type_systems/stlc_extended/bigstep.v
+theories/type_systems/stlc_extended/parallel_subst.v
+theories/type_systems/stlc_extended/logrel.v
 
 
 
 # System F
-theories/systemf/lang.v
-theories/systemf/notation.v
-theories/systemf/types.v
-theories/systemf/tactics.v
-theories/systemf/bigstep.v
-theories/systemf/church_encodings.v
-theories/systemf/parallel_subst.v
-theories/systemf/logrel.v
-theories/systemf/free_theorems.v
-theories/systemf/binary_logrel.v
-theories/systemf/existential_invariants.v
+theories/type_systems/systemf/lang.v
+theories/type_systems/systemf/notation.v
+theories/type_systems/systemf/types.v
+theories/type_systems/systemf/tactics.v
+theories/type_systems/systemf/bigstep.v
+theories/type_systems/systemf/church_encodings.v
+theories/type_systems/systemf/parallel_subst.v
+theories/type_systems/systemf/logrel.v
+theories/type_systems/systemf/free_theorems.v
+theories/type_systems/systemf/binary_logrel.v
+theories/type_systems/systemf/existential_invariants.v
 
 
 # SystemF-Mu
-theories/systemf_mu/lang.v
-theories/systemf_mu/notation.v
-theories/systemf_mu/types.v
-theories/systemf_mu/tactics.v
-theories/systemf_mu/pure.v
-theories/systemf_mu/untyped_encoding.v
-theories/systemf_mu/parallel_subst.v
-theories/systemf_mu/logrel.v
-theories/systemf_mu/z_combinator.v
+theories/type_systems/systemf_mu/lang.v
+theories/type_systems/systemf_mu/notation.v
+theories/type_systems/systemf_mu/types.v
+theories/type_systems/systemf_mu/tactics.v
+theories/type_systems/systemf_mu/pure.v
+theories/type_systems/systemf_mu/untyped_encoding.v
+theories/type_systems/systemf_mu/parallel_subst.v
+theories/type_systems/systemf_mu/logrel.v
+theories/type_systems/systemf_mu/z_combinator.v
 
 # SystemF + Mu + State
-theories/systemf_mu_state/locations.v
-theories/systemf_mu_state/lang.v
-theories/systemf_mu_state/notation.v
-theories/systemf_mu_state/types.v
-theories/systemf_mu_state/tactics.v
-theories/systemf_mu_state/execution.v
-theories/systemf_mu_state/parallel_subst.v
-theories/systemf_mu_state/logrel.v
-theories/systemf_mu_state/mutbit.v
+theories/type_systems/systemf_mu_state/locations.v
+theories/type_systems/systemf_mu_state/lang.v
+theories/type_systems/systemf_mu_state/notation.v
+theories/type_systems/systemf_mu_state/types.v
+theories/type_systems/systemf_mu_state/tactics.v
+theories/type_systems/systemf_mu_state/execution.v
+theories/type_systems/systemf_mu_state/parallel_subst.v
+theories/type_systems/systemf_mu_state/logrel.v
+theories/type_systems/systemf_mu_state/mutbit.v
 
 
 
 # Program logic library
-theories/axiomatic/program_logic/notation.v
-theories/axiomatic/program_logic/sequential_wp.v
-theories/axiomatic/program_logic/lifting.v
-theories/axiomatic/program_logic/ectx_lifting.v
-theories/axiomatic/program_logic/adequacy.v
-theories/axiomatic/heap_lang/primitive_laws.v
-theories/axiomatic/heap_lang/derived_laws.v
-theories/axiomatic/heap_lang/proofmode.v
-theories/axiomatic/heap_lang/adequacy.v
-theories/axiomatic/heap_lang/primitive_laws_nolater.v
+theories/program_logics/program_logic/notation.v
+theories/program_logics/program_logic/sequential_wp.v
+theories/program_logics/program_logic/lifting.v
+theories/program_logics/program_logic/ectx_lifting.v
+theories/program_logics/program_logic/adequacy.v
+theories/program_logics/heap_lang/primitive_laws.v
+theories/program_logics/heap_lang/derived_laws.v
+theories/program_logics/heap_lang/proofmode.v
+theories/program_logics/heap_lang/adequacy.v
+theories/program_logics/heap_lang/primitive_laws_nolater.v
 
 
 # Program logic chapter
-theories/axiomatic/hoare_lib.v
-theories/axiomatic/hoare.v
-theories/axiomatic/ipm.v
-theories/axiomatic/later_loeb.v
+theories/program_logics/hoare_lib.v
+theories/program_logics/hoare.v
+theories/program_logics/ipm.v
+theories/program_logics/later_loeb.v
 
-theories/axiomatic/invariant_lib.v
+theories/program_logics/invariant_lib.v
 # logrel
-theories/axiomatic/logrel/syntactic.v
-theories/axiomatic/logrel/notation.v
-theories/axiomatic/logrel/persistent_pred.v
-theories/axiomatic/logrel/logrel.v
-theories/axiomatic/logrel/adequacy.v
-theories/axiomatic/logrel/ghost_state_lib.v
-theories/axiomatic/logrel/ghost_state.v
+theories/program_logics/logrel/syntactic.v
+theories/program_logics/logrel/notation.v
+theories/program_logics/logrel/persistent_pred.v
+theories/program_logics/logrel/logrel.v
+theories/program_logics/logrel/adequacy.v
+theories/program_logics/logrel/ghost_state_lib.v
+theories/program_logics/logrel/ghost_state.v
 
 
 # resources
-theories/axiomatic/ra_lib.v
-#theories/axiomatic/resource_algebras.v
+theories/program_logics/ra_lib.v
+theories/program_logics/resource_algebras.v
 
-theories/axiomatic/fupd.v
+theories/program_logics/fupd.v
 
 # reloc
-theories/axiomatic/reloc/ghost_state.v
-theories/axiomatic/reloc/src_rules.v
-theories/axiomatic/reloc/persistent_bipred.v
-theories/axiomatic/reloc/notation.v
-theories/axiomatic/reloc/proofmode.v
-theories/axiomatic/reloc/syntactic.v
-theories/axiomatic/reloc/logrel.v
-theories/axiomatic/reloc/fundamental.v
-theories/axiomatic/reloc/adequacy.v
-theories/axiomatic/reloc/contextual_refinement.v
+theories/program_logics/reloc/ghost_state.v
+theories/program_logics/reloc/src_rules.v
+theories/program_logics/reloc/persistent_bipred.v
+theories/program_logics/reloc/notation.v
+theories/program_logics/reloc/proofmode.v
+theories/program_logics/reloc/syntactic.v
+theories/program_logics/reloc/logrel.v
+theories/program_logics/reloc/fundamental.v
+theories/program_logics/reloc/adequacy.v
+theories/program_logics/reloc/contextual_refinement.v
 
 # concurrency
-theories/axiomatic/concurrency.v
-theories/axiomatic/concurrent_logrel/syntactic.v
-theories/axiomatic/concurrent_logrel/logrel.v
-theories/axiomatic/concurrent_logrel/adequacy.v
+theories/program_logics/concurrency.v
+theories/program_logics/concurrent_logrel/syntactic.v
+theories/program_logics/concurrent_logrel/logrel.v
+theories/program_logics/concurrent_logrel/adequacy.v
 
-
-
-# By removing the # below, you can add the exercise sheets to make
-# theories/warmup/sheet0.v
-
-#theories/stlc/exercises01.v
-
-#theories/stlc/exercises02.v
-#
-#theories/systemf/exercises03.v
-#
-#
-#theories/stlc/cbn_logrel.v
-#theories/systemf/exercices04.v
-#theories/systemf/exercises05.v
-#theories/systemf_mu/exercises06.v
-#theories/systemf_mu_state/exercises07.v
