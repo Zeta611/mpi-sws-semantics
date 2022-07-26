@@ -12,32 +12,33 @@ Lemma refines_adequate Σ `{reloc_preGS Σ} (τ : ∀ _ : relocGS Σ, semtypeO) 
   (∀ `{relocGS Σ}, ⊢ refines e e' (τ _)) →
   adequate NotStuck e σ (λ v _, ∃ v' h', rtc thread_step (e', σ) (of_val v', h') ∧ ϕ v v').
 Proof.
-  intros Hnoproph Hpost Hlog. 
+  intros Hnoproph Hpost Hlog.
   eapply (heap_adequacy Σ _). iIntros (Hheap).
   iMod (ghost_map_alloc σ.(heap)) as "(%γheap & Hauth & _)".
   iMod (ghost_var_alloc e') as "(%γexpr & He1 & He2)".
   set (Hreloc := (RelocGS Σ _ _ _ γexpr γheap)).
-  
+
   (* initialize the invariant *)
   iApply (inv_alloc srcN (src_inv e' σ.(heap)) with "[Hauth He1]").
-  { iExists e', σ.(heap). rewrite exprS_eq heapS_auth_eq. rewrite /exprS_def /heapS_auth_def. 
+  { iExists e', σ.(heap). rewrite exprS_eq heapS_auth_eq. rewrite /exprS_def /heapS_auth_def.
     iFrame. done.
-  } 
+  }
+
   iIntros "#Hinv".
   iApply wp_fupd.
   iApply (wp_wand with "[He2]").
   { iApply (Hlog Hreloc $! []). iSplit.
     - iExists _, _. iFrame "Hinv".
     - rewrite exprS_eq /exprS_def. iFrame.
-  } 
+  }
   iIntros (v) "(%v' & [_ Hsrc] & #Ht)".
   (* requires that we open invariants around fancy updates *)
   iInv "Hinv" as "(%e'' & %σ'' & >He & >Hheap & >%Hstep)" "Hcl".
   iDestruct (exprS_agree with "He Hsrc") as %->.
-  iMod ("Hcl" with "[-]"). 
+  iMod ("Hcl" with "[-]").
   { iNext. iExists _, _. iFrame. done. }
   iModIntro. iDestruct (Hpost with "Ht") as "%Hp".
-  iPureIntro. eexists _, _. 
+  iPureIntro. eexists _, _.
   rewrite Hnoproph. split; done.
 Qed.
 
@@ -45,7 +46,7 @@ Lemma thread_erased_step e e' σ σ' :
   thread_step (e, σ) (e', σ') →
   erased_step ([e], σ) ([e'], σ').
 Proof.
-  intros Hprim. exists []. 
+  intros Hprim. exists [].
   eapply (step_atomic _ _ _ _ [] [] []); done.
 Qed.
 
@@ -60,7 +61,7 @@ Qed.
 Theorem refines_typesafety Σ `{reloc_preGS Σ} (τ : ∀ _ : relocGS Σ, semtypeO) (e e' : expr) e1 σ σ' :
   σ = mkstate σ.(heap) →
   (∀ `{relocGS Σ}, ⊢ refines e e' (τ _)) →
-  rtc thread_step (e, σ) (e1, σ') → 
+  rtc thread_step (e, σ) (e1, σ') →
   not_stuck e1 σ'.
 Proof.
   intros ? Hlog ?%rtc_thread_erased_step.
