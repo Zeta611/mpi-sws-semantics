@@ -2,6 +2,11 @@
 
 This document roughly maps the lecture notes and exercises to the Coq development.
 
+## Basic structure
+Chapters 1-4 are included in the `theories/type_systems` folder.
+Chapters 5-10 are included in the `theories/program_logics` folder.
+All of the paths given below are to be understood relative to these folders.
+
 ## Chapter 1
 * The `warmup` folder contains a quick reminder of some concepts of Coq as well as an introduction to some features of `stdpp`.
 * The `stlc` folder contains an implementation of the untyped lambda-calculus and the simply-typed lambda-calculus, with different reduction semantics, including syntactic and semantic type safety proofs.
@@ -81,15 +86,15 @@ Special notes on some exercises:
 * Exercise 56 is not present in the Coq development.
 
 ## Chapter 5
-* The development for Chapter 5 can be found in the file `axiomatic/hoare.v`.
+* The development for Chapter 5 can be found in the file `hoare.v`.
 * Exercises are provided in-line with the material.
 
 ## Chapter 6
-* The development for Chapter 6 can be found in the file `axiomatic/ipm.v`.
+* The development for Chapter 6 can be found in the file `ipm.v`.
 * Exercises are provided in-line with the material.
 
 ## Chapter 7
-* The development for Chapter 7 can be found in the folder `axiomatic/logrel.v`, in files:
+* The development for Chapter 7 can be found in the folder `logrel.v`, in files:
   + `syntactic.v` defines a syntactic type system for our language.
   + `logrel.v` defines the logical relation and proves the fundamental theorem.
   + `adequacy.v` proves adequacy of the logical relation.
@@ -101,19 +106,19 @@ Special notes on some exercises:
 
 | Section | Coq entry point                                                   |
 |---------|-------------------------------------------------------------------|
-| 8.0     | `axiomatic/logrel/ghost_state.v`                                  |
-| 8.1     | `axiomatic/resource_algebras.v`                                   |
-| 8.2     | `axiomatic/resource_algebras.v`                                   |
-| 8.3     | `axiomatic/resource_algebras.v`                                   |
-| 8.4     | `axiomatic/reloc` and `axiomatic/fupd.v`                          |
+| 8.0     | `logrel/ghost_state.v`                                            |
+| 8.1     | `resource_algebras.v`                                             |
+| 8.2     | `resource_algebras.v`                                             |
+| 8.3     | `resource_algebras.v`                                             |
+| 8.4     | `reloc` and `fupd.v`                                              |
 
 In particular, for ReLoC/ the binary logical relation, the following files are of interest:
-- `axiomatic/reloc/ghost_state.v` defines the ghost theory (Section 8.4.3),
-- `axiomatic/fupd.v` introduces the fancy update modality (Section 8.4.2),
-- `axiomatic/reloc/src_rules.v` proves the ghost program rules (Section 8.4.1/8.4.3),
-- `axiomatic/reloc/logrel.v` defines the logical relation (Section 8.4.1),
-- `axiomatic/reloc/fundamental.v` proves the fundamental property (Section 8.4.4),
-- `axiomatic/reloc/adequacy.v` proves the contextual refinement result (Section 8.4.4).
+- `reloc/ghost_state.v` defines the ghost theory (Section 8.4.3),
+- `fupd.v` introduces the fancy update modality (Section 8.4.2),
+- `reloc/src_rules.v` proves the ghost program rules (Section 8.4.1/8.4.3),
+- `reloc/logrel.v` defines the logical relation (Section 8.4.1),
+- `reloc/fundamental.v` proves the fundamental property (Section 8.4.4),
+- `reloc/adequacy.v` proves the contextual refinement result (Section 8.4.4).
 
 Notes on exercises:
 * Exercise 116 (coming up with an interesting refinement and proving it) is not present in the Coq development.
@@ -126,10 +131,10 @@ Notes on exercises:
 
 | Section | Coq entry point                                                   |
 |---------|-------------------------------------------------------------------|
-| 10.0    | `axiomatic/concurrency.v`                                         |
-| 10.1    | `axiomatic/concurrency.v`                                         |
-| 10.2    | `axiomatic/concurrency.v`                                         |
-| 10.3    | `axiomatic/concurrent_logrel/`                                    |
+| 10.0    | `concurrency.v`                                                   |
+| 10.1    | `concurrency.v`                                                   |
+| 10.2    | `concurrency.v`                                                   |
+| 10.3    | `concurrent_logrel/`                                              |
 
 Notes on exercises:
 * The exercise for verifying the channel implementation (Section 10.3) is located in `axiomatic/concurrency.v`.
