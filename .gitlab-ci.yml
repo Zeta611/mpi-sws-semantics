@@ -1,0 +1,50 @@
+image: ralfjung/opam-ci:opam2
+
+stages:
+  - build
+
+variables:
+  CPU_CORES: "10"
+
+.template: &template
+  stage: build
+  tags:
+  - fp
+  script:
+  - git clone https://gitlab.mpi-sws.org/iris/ci.git ci -b opam2
+  - ci/buildjob
+  cache:
+    key: "$CI_JOB_NAME"
+    paths:
+    - _opam/
+  only:
+  - new/@FP/semantics-course
+  - /^ci/@FP/semantics-course
+  except:
+  - triggers
+  - schedules
+  - api
+
+## Build jobs
+
+# build against known-working Coq 8.15.1
+build-coq.8.15.1:
+  <<: *template
+  variables:
+    OPAM_PINS: "coq version 8.15.1"
+    #DENY_WARNINGS: "1"
+    #MANGLE_NAMES: "1"
+    #OPAM_PKG: "1"
+
+# nightly build against iris-dev
+build-iris.dev:
+  <<: *template
+  variables:
+    STDPP_REPO: "iris/stdpp"
+    IRIS_REPO: "iris/iris"
+    OPAM_PINS: "coq version 8.15.dev   git+https://gitlab.mpi-sws.org/$STDPP_REPO#$STDPP_REV   git+https://gitlab.mpi-sws.org/$IRIS_REPO#$IRIS_REV"
+  except:
+  only:
+  - triggers
+  - schedules
+  - api
