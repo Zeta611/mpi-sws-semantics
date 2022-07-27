@@ -1,6 +1,6 @@
 # Coq development for the Semantics course at Saarland University
 
-This repository contains the Coq code for the Semantics course taught by Derek Dreyer at Saarland University.
+This repository contains the Coq code for [the Semantics course](https://plv.mpi-sws.org/semantics-course/) taught by Derek Dreyer at Saarland University. You can find an overview of how the Coq development maps to [the lecture notes](https://plv.mpi-sws.org/semantics-course/lecturenotes.pdf) of the course in the file [STRUCTURE](STRUCTURE.md).
 
 ## Installation Instructions
 
