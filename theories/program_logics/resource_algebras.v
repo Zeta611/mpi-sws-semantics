@@ -13,21 +13,26 @@ From iris.prelude Require Import options.
 
 (* Allocation ResAlloc *)
 (* Note that we use the symbol ✓ for validity *)
-Check own_alloc.
+(*Check own_alloc.*)
+
 (* Interaction with separating conjunction, ResSep *)
-Check own_op.
+(*Check own_op.*)
+
 (* The core is persistent, ResPers *)
 (* (this is formulated slightly differently here: [CoreId a] says that [a] is its own core) *)
-Check own_core_persistent.
+(*Check own_core_persistent.*)
+
 (* Resources are valid, ResValid *)
-Check own_valid.
+(*Check own_valid.*)
+
 (* Frame-preserving updates, ResUpd *)
-Check own_update.
+(*Check own_update.*)
 
 (* [own] is monotonous wrt inclusion *)
-Check own_mono.
+(*Check own_mono.*)
+
 (* We can always own a unit *)
-Check own_unit.
+(*Check own_unit.*)
 
 (** Some notes on the setup in Coq:
   1. The `inG` assumptions you see for these lemmas above require that the given algebra has been registered with Iris, similar to the `mono_natG Σ` assumption you have already seen. We will discuss this later in more detail.
@@ -60,10 +65,10 @@ Check own_unit.
 
   In addition, it carries a proof that these operations satisfy the necessary laws [LRAMixin].
  *)
-Print lra.
+(*Print lra.*)
 
 (** The required laws: this matches what you can find in the lecture notes. *)
-Print LRAMixin.
+(*Print LRAMixin.*)
 
 (** We require a few additional operations:
   - [lra_included] defines the inclusion [≼]
@@ -71,11 +76,11 @@ Print LRAMixin.
    Here [⋅?] lifts the operation [⋅] to optional right-hand sides: [opMLRA].
   - [lra_exclusive] defines what it means for an element to be exclusive (i.e., not compose with any frame).
  *)
-Print lra_included.
-Print lra_update.
-Print lra_local_update.
-Print opMLRA.
-Print lra_exclusive.
+(*Print lra_included.*)
+(*Print lra_update.*)
+(*Print lra_local_update.*)
+(*Print opMLRA.*)
+(*Print lra_exclusive.*)
 
 (** We prove some derived lemmas *)
 
@@ -144,9 +149,10 @@ Qed.
 
 (** In addition, we need a notion of unital RAs (i.e., RAs with a unit). *)
 (** In addition to [lra]s, they need to have a unit [ε] (type \varepsilon). *)
-Print ulra.
+(*Print ulra.*)
+
 (** The unit needs to satisfy the following laws: *)
-Print ULRAMixin.
+(*Print ULRAMixin.*)
 
 (** Unit: derived laws *)
 Global Instance ulra_unit_right_id {A : ulra} : RightId (=) ε (@op A _).

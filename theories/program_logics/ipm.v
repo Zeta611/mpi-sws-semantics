@@ -7,8 +7,8 @@ From semantics.pl.program_logic Require Import notation.
 
 (** ** Magic is in the air *)
 Import hoare.
-Check ent_wand_intro.
-Check ent_wand_elim.
+(*Check ent_wand_intro.*)
+(*Check ent_wand_elim.*)
 
 Section primitive.
 Implicit Types (P Q R: iProp).
@@ -283,13 +283,13 @@ Admitted.
 
 (** Weakest precondition rules *)
 
-Check ent_wp_value.
-Check ent_wp_wand.
-Check ent_wp_bind.
-Check ent_wp_pure_step.
-Check ent_wp_new.
-Check ent_wp_load.
-Check ent_wp_store.
+(*Check ent_wp_value.*)
+(*Check ent_wp_wand.*)
+(*Check ent_wp_bind.*)
+(*Check ent_wp_pure_step.*)
+(*Check ent_wp_new.*)
+(*Check ent_wp_load.*)
+(*Check ent_wp_store.*)
 
 Lemma ent_wp_pure_steps e e' Φ :
   rtc pure_step e e' →
@@ -426,14 +426,14 @@ Admitted.
 
 
 (** ** Persistency *)
-Check ent_pers_dup.
-Check ent_pers_elim.
-Check ent_pers_mono.
-Check ent_pers_pure.
-Check ent_pers_and_sep.
-Check ent_pers_idemp.
-Check ent_pers_all.
-Check ent_pers_exists.
+(*Check ent_pers_dup.*)
+(*Check ent_pers_elim.*)
+(*Check ent_pers_mono.*)
+(*Check ent_pers_pure.*)
+(*Check ent_pers_and_sep.*)
+(*Check ent_pers_idemp.*)
+(*Check ent_pers_all.*)
+(*Check ent_pers_exists.*)
 
 Lemma ent_pers_dup' P :
   □ P ⊢ (□ P) ∗ (□ P).
@@ -551,15 +551,17 @@ Section hoare_external.
 End hoare_external.
 
 (** ** Invariants *)
-Check ent_inv_pers.
-Check ent_inv_alloc.
+(*Check ent_inv_pers.*)
+(*Check ent_inv_alloc.*)
+
 (* The following rule is more comvenient to use *)
-Check inv_alloc.
+(*Check inv_alloc.*)
+
 (** We require a sidecondition here, namely that [F] is "timeless". All propositions we have seen up to now are in fact timeless.
   We will see propositions that do not satisfy this requirement and which need a stronger rule for invariants soon.
 *)
-Check ent_inv_open.
-Check inv_open.
+(*Check ent_inv_open.*)
+(*Check inv_open.*)
 
 
 (** MyMutBit *)

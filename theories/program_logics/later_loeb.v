@@ -6,25 +6,25 @@ From semantics.pl Require Import hoare_lib.
 From semantics.pl.program_logic Require Import notation.
 From semantics.pl Require Import ipm.
 
-(** Step-indexing *)
+(** ** Step-indexing *)
 Import hoare ipm.
 Implicit Types
   (P Q R: iProp)
   (Φ Ψ : val → iProp)
 .
 
-Check ent_later_intro.
-Check ent_later_mono.
-Check ent_löb.
-Check ent_later_sep.
-Check ent_later_exists.
-Check ent_later_all.
-Check ent_later_pers.
+(*Check ent_later_intro.*)
+(*Check ent_later_mono.*)
+(*Check ent_löb.*)
+(*Check ent_later_sep.*)
+(*Check ent_later_exists.*)
+(*Check ent_later_all.*)
+(*Check ent_later_pers.*)
 
-Check ent_later_wp_pure_step.
-Check ent_later_wp_new.
-Check ent_later_wp_load.
-Check ent_later_wp_store.
+(*Check ent_later_wp_pure_step.*)
+(*Check ent_later_wp_new.*)
+(*Check ent_later_wp_load.*)
+(*Check ent_later_wp_store.*)
 
 (* Exercise: Derive the old rules from the new ones. *)
 Lemma ent_wp_pure_step_old e e' Φ :
@@ -49,19 +49,40 @@ Proof.
   (* FIXME: exercise *)
 Admitted.
 
-(* TODO: this is an exercise *)
 Lemma ent_later_and P Q :
   ▷ (P ∧ Q) ⊣⊢ ▷ P ∧ ▷ Q.
 Proof.
-  (* FIXME: exercise *)
-Admitted.
+  specialize (ent_later_all (λ b : bool, if b then P else Q)). rewrite !ent_equiv.
+  intros [Ha Hb]. split.
+  - apply ent_and_intro.
+    + etrans; first etrans; [ | apply Ha | ].
+      * apply ent_later_mono. apply ent_all_intro. intros []; [apply ent_and_elim_l | apply ent_and_elim_r].
+      * etrans; first apply (ent_all_elim true). apply ent_later_mono. done.
+    + apply ent_later_mono. apply ent_and_elim_r.
+  - etrans; first etrans; [ | apply Hb | ].
+    + apply ent_all_intro. intros []; [apply ent_and_elim_l | apply ent_and_elim_r].
+    + apply ent_later_mono. apply ent_and_intro.
+      * apply (ent_all_elim true).
+      * apply (ent_all_elim false).
+Qed.
 
-(* TODO this is an exercise *)
 Lemma ent_later_or P Q :
   ▷ (P ∨ Q) ⊣⊢ ▷ P ∨ ▷ Q.
 Proof.
-  (* FIXME: exercise *)
-Admitted.
+  specialize (ent_later_exists (λ b : bool, if b then P else Q)). rewrite !ent_equiv.
+  intros [Ha Hb]. split.
+  - etrans; first etrans; [ | apply Ha | ].
+    + apply ent_later_mono. apply ent_or_elim.
+      * by apply (ent_exist_intro true).
+      * by apply (ent_exist_intro false).
+    + apply ent_exist_elim. intros []; [apply ent_or_introl | apply ent_or_intror].
+  - etrans; first etrans; [ | apply Hb | ].
+    + apply ent_or_elim.
+      * by apply (ent_exist_intro true).
+      * by apply (ent_exist_intro false).
+    + apply ent_later_mono. apply ent_exist_elim.
+      intros []; [apply ent_or_introl | apply ent_or_intror].
+Qed.
 
 Lemma ent_all_pers {X} (Φ : X → iProp) :
   □ (∀ x : X, Φ x) ⊢ ∀ x : X, □ Φ x.
@@ -104,7 +125,7 @@ Proof.
 
   Restart.
   iIntros "($ & $)".
-Qed.
+Abort.
 
 Lemma ipm_later_exists_commuting (Φ : nat → iProp) :
   ▷ (∃ n : nat, Φ n) -∗ ∃ n : nat, ▷ Φ n.
@@ -112,8 +133,8 @@ Proof.
   (* automatically commutes the later around the existential *)
   (* note: in general, this relies on the type that is existentially quantified over
     to be [Inhabited]. The IPM tactics will fail if an instance for that cannot be found. *)
-  iIntros "(%n & Hn)". eauto with iFrame.
-Qed.
+  iIntros "(%n & Hn)".
+Abort.
 
 Lemma ipm_later_or_commuting P Q :
   ▷ (P ∨ Q) -∗ ▷ P ∨ ▷ Q.
@@ -123,7 +144,7 @@ Proof.
 
   Restart.
   iIntros "[ $ | $ ]".
-Qed.
+Abort.
 
 Lemma ipm_later_next_1 P Q R `{!Persistent P} :
   ▷ P -∗ ▷ R -∗ ▷ Q.
@@ -133,15 +154,20 @@ Proof.
   iNext.
 Abort.
 
-(* The recursion lemma from above, proved with the IPM and Löb induction *)
+(** The recursion lemma from above, proved with the IPM and Löb induction *)
 Lemma ent_wp_rec v Φ (Ψ : val → val → iProp) e :
   (∀ v, (Φ v ∗ (∀ u, {{ Φ u }} (rec: "f" "x" := e) u {{ Ψ u }}) ⊢ WP subst "x" v (subst "f" (rec: "f" "x" := e) e) {{ Ψ v }})) →
   (Φ v ⊢ WP (rec: "f" "x" := e) v {{ Ψ v }}).
 Proof.
-  iIntros (Hs). iLöb as "IH" forall (v). iIntros "Hv".
-  wp_pures. iApply Hs. iFrame "Hv". eauto.
+  iIntros (Hs). iLöb as "IH" forall (v).
+  iIntros "Hv".
+  wp_pures. iApply Hs. iFrame "Hv".
+  iIntros (v') "!> Hv'".
+  by iApply "IH".
 Qed.
 
+
+(** The Z combinator *)
 Section Z.
   Context (e : expr).
   Definition g : val := λ: "f", let: "f" := λ: "x", "f" "f" "x" in λ: "x", e.
@@ -151,21 +177,20 @@ Section Z.
     (∀ v, (Φ v ∗ (∀ u, {{ Φ u }} Z_com u {{ Ψ u }}) ⊢ WP subst "x" v (subst "f" Z_com e) {{ Ψ v }})) →
     (Φ v ⊢ WP Z_com v {{ Ψ v }}).
   Proof.
-   (* FIXME: exercise *)
-Admitted.
+    (* FIXME: exercise *)
+  Admitted.
 End Z.
 
-(** ** Recursive definitions *)
 Notation iPropO := (iPropO adequacy.heapΣ).
 (** To define the recursive predicate [infinite_exec] formally (by taking a fixpoint), we need to invoke some machinery.
  *)
-(* We first define the function of which we take the fixpoint (in [μ F. P], imagine that this is the function taking F and returning P).
+(** We first define the function of which we take the fixpoint (in [μ F. P], imagine that this is the function taking F and returning P).
  We use [exprO] instead of [expr], [iPropO] instead of [iProp], and [λne] and [-n>] to account for some of the details of Iris's algebraic step-indexed model which enables us to make this recursive definition.
   This will become clearer in a few weeks when we consider Iris's model.
  *)
 Definition infinite_exec_pre (inf : exprO -n> iPropO) : exprO -n> iPropO :=
   (λne e, ∃ e', ⌜pure_step e e'⌝ ∗ ▷ inf e')%I.
-(*
+(**
   Our recursive definition needs to be [Contractive], which essentially means that
   all recursive occurrences of the predicate are guarded by a ▷.
   This ensures that we can take the fixpoint.
@@ -196,7 +221,7 @@ Lemma infinite_exec_Omega :
   ⊢ infinite_exec Omega.
 Proof.
   iLöb as "IH".
-  rewrite {2} infinite_exec_unfold /infinite_exec_pre /=.
+  rewrite {2}infinite_exec_unfold /infinite_exec_pre /=.
   iExists Omega. iSplitR; last done.
   iPureIntro. apply pure_step_beta.
 Qed.
@@ -204,13 +229,15 @@ Qed.
 Lemma infinite_wp_False' e :
   infinite_exec e ⊢ WP e {{ _, False }}.
 Proof.
-  (* FIXME: exercise, don't use the IPM *)
+  (* FIXME: exercise *)
 Admitted.
 Lemma infinite_wp_False e :
   infinite_exec e ⊢ WP e {{ _, False }}.
 Proof.
-  (* FIXME: exercise, use the IPM *)
+  (* FIXME: exercise *)
 Admitted.
+
+
 
 (** Diverge using higher-order state *)
 Definition diverge_ho : expr :=
@@ -227,7 +254,7 @@ Proof.
   wp_load. wp_pures. by iApply "IH".
 Qed.
 
-(** Exercise: Landin's knot *)
+(** Landin *)
 Definition landins_knot : val :=
   λ: "f",
     let: "x" := ref (λ: "x", #0) in
@@ -246,8 +273,8 @@ Admitted.
 Import impred_invariants.
 (* [ent_inv_pers] and [ent_inv_alloc] hold unchanged *)
 (* The opening rules that support impredicative invariants put a later ▷ around the contents [F]. *)
-Check ent_inv_open.
-Check inv_open.
+(*Check ent_inv_open.*)
+(*Check inv_open.*)
 
 Definition lazyintN := nroot .@ "lazyint".
 Definition LazyInt (f : val) (n : Z) : iProp := WP (f #()) {{ w, ⌜w = #n⌝ }}%I.
@@ -267,24 +294,42 @@ Proof.
   wp_pures. by iApply ent_wp_value.
 Qed.
 
+Definition retrieve : val :=
+  λ: "c", match: !"c" with
+  InjL "cc" =>
+    match: "cc" with
+     InjL "f" => "c" <- InjR #();; InjL "f"
+   | InjR "y" => InjR "y"
+   end
+ | InjR "cc" =>
+   (* error case, we just diverge *)
+   (rec: "rec" <> := "rec" #()) #()
+  end.
+
 Definition cache : val :=
   λ: "f",
   let: "c" := ref (InjL (InjL "f")) in
-  λ: <>, let: "res" := ref (InjLV #()) in
-         match: !"c" with
-          InjL "cc" =>
-            match: "cc" with
-             InjL "f" => "c" <- InjR #();; "res" <- InjL "f"
-           | InjR "y" => "res" <- InjR "y"
-           end
-         | InjR "cc" =>
-           (* error case, we just diverge *)
-           (rec: "rec" <> := "rec" #()) #()
-         end;;
-         match: !"res" with
+  λ: <>, let: "r" := retrieve "c" in
+         match: "r" with
            InjL "f" => let: "y" := "f" #() in "c" <- InjL (InjR "y");; "y"
          | InjR "y" => "y"
          end.
+
+Local Definition I (f: val) (n: Z) (l: loc) : iProp :=
+  (((l ↦ InjLV (InjLV f) ∗ LazyInt f n) ∨ l ↦ InjLV (InjRV #n)) ∨ l ↦ InjRV #())%I.
+
+Lemma retrieve_spec f n l N:
+  ▷ I f n l ⊢ WP retrieve #l @ ⊤∖↑N {{ r, I f n l ∗ (⌜r = InjLV f⌝ ∗ LazyInt f n ∨ ⌜r = InjRV #n⌝) }}.
+Proof.
+  iIntros "I". unfold retrieve. wp_pure _.
+  unfold I at 1. iDestruct "I" as "[[[Hl Hlzy]|Hl]|Hl]".
+  - wp_load. wp_pures. wp_store. wp_pures. iApply wp_value.
+    unfold I. eauto with iFrame.
+  - wp_load. wp_pures. iApply wp_value.
+    unfold I. eauto with iFrame.
+  - wp_load. wp_pures. iClear "Hl".
+    iLöb as "IH". wp_pure _. done.
+Qed.
 
 Lemma cache_spec f n :
   ⊢ {{ LazyInt f n }} cache f {{ g, □ LazyInt g n }}.
@@ -292,40 +337,118 @@ Proof.
   iIntros "!> Hlazy". unfold cache.
   wp_alloc l as "Hc". wp_pures.
 
-  set (INV := (((l ↦ InjLV (InjLV f) ∗ LazyInt f n) ∨ l ↦ InjLV (InjRV #n)) ∨ l ↦ InjRV #())%I).
   set (Name := lazyintN.@ l).
-  iApply (inv_alloc Name INV with "[Hlazy Hc]").
-  { unfold INV. iLeft. iLeft. iFrame. }
+  iApply (inv_alloc Name (I f n l) with "[Hlazy Hc]").
+  { unfold I. eauto with iFrame. }
   iIntros "#HInv".
 
   iApply wp_value.
   unfold LazyInt. iModIntro.
-  wp_pures. wp_alloc res as "Hres". wp_pures.
-  wp_bind (Case _ _ _).
+  wp_pures. wp_bind (retrieve _).
   iApply (inv_open with "HInv"); first set_solver.
-  iIntros "Hinv". rewrite {2}/INV.
-  iDestruct "Hinv" as "[[(>Hl & Hlazy) | Hl] | Hl]".
-  - wp_load. wp_pures. wp_store. wp_store.
-    iApply wp_value. iSplitL "Hl".
-    { iRight. iFrame. }
-    wp_pures. wp_load. wp_pures.
-    wp_bind (f _).
-    iApply (wp_wand with "Hlazy").
+  iIntros "I". iApply (wp_wand with "[I]").
+  { by iApply retrieve_spec. }
+  iIntros (r) "[I Hr]". iFrame "I".
+  iDestruct "Hr" as "[[-> Hlzy]|->]"; wp_pures; last first.
+  - iApply wp_value. done.
+  - wp_bind (f _). iApply (wp_wand with "Hlzy").
     iIntros (v) "->". wp_pures.
+    wp_bind (#l <- _)%E.
     iApply (inv_open with "HInv"); first set_solver.
-    iIntros "Hinv".
-    iDestruct "Hinv" as "[[(>Hl & Hlazy) | >Hl] | >Hl]";
-    wp_store; iApply wp_value.
-    all: iSplitL; last done. all: iLeft; iRight; iFrame.
-  - wp_load. wp_pures. wp_store. iApply wp_value.
-    iSplitL "Hl". { iLeft. iRight. iFrame. }
-    wp_pures. wp_load. wp_pures. iApply wp_value. done.
-  - wp_load. wp_pures.
-    iClear "Hres Hl".
-    iLöb as "IH". wp_rec. iApply "IH".
+    iIntros "I"; iDestruct "I" as "[[[>Hl Hlzy]|>Hl]|>Hl]"; wp_store;
+      iApply wp_value; iSplitL; unfold I; eauto with iFrame.
+    all: wp_pures; iApply wp_value; done.
 Qed.
 
-(** Exercise: LazyInt2 *)
+Definition cache' : val :=
+  λ: "f",
+  let: "c" := ref (InjL "f") in
+  λ: <>, match: !"c" with
+          InjL "g" =>
+            let: "k" := "g" #() in "c" <- "k";; "k"
+          | InjR "k" =>  "k"
+          end.
+
+
+Definition E : expr :=
+  let: "z" := ref (λ: <>, #0) in
+  let: "r" := ref #true in
+  let: "z'" :=
+    λ: <>, (assert (!"r");; "r" <- #false;; !"z") #() in
+  let: "c" := cache' "z'" in
+  "z" <- "c";; "c" #().
+
+
+
+Lemma E_safe :
+  (∀ f n, {{ LazyInt f n }} cache' f {{ g, □ LazyInt g n }}) ⊢
+  {{ True }} E {{ _, True }}.
+Proof.
+  iIntros "#Hcache !> _". rewrite /E. wp_alloc z as "Hz".
+  iAssert (□ LazyInt (λ: <>, #0) 0)%I as "Hlazy".
+  { iModIntro. rewrite /LazyInt. wp_pures. by iApply wp_value. }
+  wp_pures. wp_alloc r as "Hr". wp_pures.
+  pose (λ: <>, (assert (! #r);; #r <- #false;; ! #z) #())%V as h. fold h.
+  iApply (inv_alloc nroot (∃ f, z ↦ f ∗ □ LazyInt f 0) with "[Hz]").
+  { iExists _. iFrame. done. }
+  iIntros "#I". iClear "Hlazy".
+  iAssert (LazyInt h 0) with "[Hr]" as "Hh".
+  { rewrite /LazyInt /h. wp_pure _.
+    (* the code here is a bit akward due to the
+       fact that we need to close invariants in the
+       post *)
+    wp_bind (_;; _ ;; _)%E.
+    iApply (inv_open with "I"); first set_solver.
+    iIntros "Inv". rewrite /h. wp_pures.
+    iDestruct "Inv" as "(%f & Hz & #Hf)".
+    wp_load. wp_pures. wp_store. wp_load.
+    iApply wp_value.
+    (* we close the invariant again *)
+    iSplitL "Hz"; first eauto with iFrame.
+    iApply "Hf". }
+    (* since h is a lazy int, we can cache it *)
+    wp_bind (cache' h).
+    iApply (wp_wand with "[Hh]"); first by iApply "Hcache".
+    iIntros (c) "#Hc".
+
+    wp_pures. wp_bind (_ <- _)%E.
+    iApply (inv_open with "I"); first set_solver.
+    iIntros "(%f & >Hz & Hlazy)". wp_store.
+    iApply wp_value.
+
+    iSplitL "Hz"; first by eauto with iFrame.
+    wp_pures. iApply (wp_wand with "Hc").
+    iIntros (v) "_". done.
+Qed.
+
+
+(** Let's see what happens if we symbolically execute E.
+   We do it inside of a weakest pre, because we can use all
+   of Iris's tactics. If you do not trust this setup and
+   believe some the proof takes a wrong turn somewhere, you
+   can always use the operatinal semantics itself to show
+   that E will reach a stuck state. *)
+Lemma E_not_safe:
+  ⊢ {{ True }} E {{ _, True }}.
+Proof.
+  iIntros "!> _". rewrite /E. wp_alloc z as "Hz".
+  wp_pures. wp_alloc r as "Hr". wp_pures.
+  pose (λ: <>, (assert (! #r);; #r <- #false;; ! #z) #())%V as h. fold h.
+  rewrite /cache'.
+  wp_pures. wp_alloc l as "Hl".
+  wp_pures. wp_store.
+  wp_pures. wp_load.
+  wp_pures. rewrite {2}/h.
+  wp_pures. wp_load. wp_pures.
+  wp_store. wp_load. wp_pures.
+  wp_load. wp_pures. rewrite {2}/h.
+  wp_pures. wp_load. wp_pures.
+  wp_bind (#0 #0)%E.
+
+  (* Whooops *)
+Abort.
+
+
 Definition lazyint_two : val :=
   λ: "f1" "f2" "i",
     let: "c" := cache "i" in
@@ -340,7 +463,7 @@ Proof.
 Admitted.
 
 
-(** Exercise: Derive the invariant opening rule for timeless propositions. *)
+(** Exercise: derive the invariant rule for timeless propositions *)
 Lemma inv_open_timeless N E F `{!Timeless F} e Φ :
   ↑N ⊆ E →
   inv N F -∗

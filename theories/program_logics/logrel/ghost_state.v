@@ -9,9 +9,9 @@ From iris.prelude Require Import options.
 Set Default Proof Using "Type*".
 
 (** Update rules *)
-Check upd_return.
-Check upd_bind.
-Check upd_wp.
+(*Check upd_return.*)
+(*Check upd_bind.*)
+(*Check upd_wp.*)
 
 (** Derived rules *)
 Section derived.
@@ -30,16 +30,14 @@ Section derived.
     (P ⊢ Q) →
     (|==> P) ⊢ |==> Q.
   Proof.
-    (* FIXME exercise *)
+    (* FIXME: exercise *)
   Admitted.
-
 
   Lemma upd_trans P :
     (|==> |==> P) ⊢ |==> P.
   Proof.
-    (* FIXME exercise *)
+    (* FIXME: exercise *)
   Admitted.
-
 
   Lemma upd_frame P Q :
     P -∗ (|==> Q) -∗ |==> (P ∗ Q).
@@ -49,19 +47,20 @@ Section derived.
 End derived.
 
 (** ** The mono nat ghost theory *)
-Check mono.
-Check lb.
+(*Check mono.*)
+(*Check lb.*)
 
-Check mono_nat_make_bound.
-Check mono_nat_use_bound.
-Check mono_nat_increase_val.
-Check mono_nat_new.
+(*Check mono_nat_make_bound.*)
+(*Check mono_nat_use_bound.*)
+(*Check mono_nat_increase_val.*)
+(*Check mono_nat_new.*)
 
 (* The lb resource is persistent *)
-Check mono_nat_lb_persistent.
+(*Check mono_nat_lb_persistent.*)
+
 (* Both resources are also timeless *)
-Check mono_nat_lb_timeless.
-Check mono_nat_mono_timeless.
+(*Check mono_nat_lb_timeless.*)
+(*Check mono_nat_mono_timeless.*)
 
 Section mono_derived.
 (** In addition to the known [heapGS] assumption, we now also need to assume that the ghost state for the theory of mono_nat has been registered with Iris, expressed through the [mono_natG] assumption.
@@ -89,7 +88,7 @@ Section mono_derived.
   Lemma mono_nat_new_wp e Φ n :
     (∀ γ, mono γ n -∗ WP e {{ Φ }}) -∗ WP e {{ Φ }}.
   Proof.
-    (* FIXME exercise *)
+    (* FIXME: exercise *)
   Admitted.
 End mono_derived.
 
@@ -189,20 +188,21 @@ Section logrel_symbol.
   Qed.
 End logrel_symbol.
 
+
 (** Exercise: Oneshot *)
 Section logrel_oneshot.
   Import logrel.notation syntactic logrel.
   Context `{heapGS Σ} `{oneshotG Σ nat}.
 
 
-  Check os_pending_alloc.
-  Check os_pending_shoot.
-  Check os_shot_persistent.
-  Check os_pending_shot_False.
-  Check os_pending_pending_False.
-  Check os_shot_agree.
-  Check os_shot_timeless.
-  Check os_pending_timeless.
+  (*Check os_pending_alloc.*)
+  (*Check os_pending_shoot.*)
+  (*Check os_shot_persistent.*)
+  (*Check os_pending_shot_False.*)
+  (*Check os_pending_pending_False.*)
+  (*Check os_shot_agree.*)
+  (*Check os_shot_timeless.*)
+  (*Check os_pending_timeless.*)
 
   Definition code : expr :=
     let: "x" := ref #42 in
@@ -225,10 +225,10 @@ Section logrel_ag.
   Import logrel.notation syntactic logrel.
   Context `{heapGS Σ} `{halvesG Σ Z}.
 
-  Check ghalves_alloc.
-  Check ghalves_agree.
-  Check ghalves_update.
-  Check ghalf_timeless.
+  (*Check ghalves_alloc.*)
+  (*Check ghalves_agree.*)
+  (*Check ghalves_update.*)
+  (*Check ghalf_timeless.*)
 
   Definition rec_code : expr :=
     λ: "f",
@@ -251,20 +251,24 @@ Section logrel_ag.
 End logrel_ag.
 
 (** Exercise: Red/blue *)
-
 Section logrel_redblue.
   Import logrel.notation syntactic logrel.
   Inductive colour := red | blue.
 
   Context `{heapGS Σ} `{agmapG Σ nat colour}.
 
-  Check agmap_auth_alloc_empty.
-  Check agmap_auth_insert.
-  Check agmap_auth_lookup.
-  Check agmap_elem_agree.
-  Check agmap_elem_persistent.
-  Check agmap_elem_timeless.
-  Check agmap_auth_timeless.
+  (*Check agmap_auth_alloc_empty.*)
+  (*Check agmap_auth_insert.*)
+  (*Check agmap_auth_lookup.*)
+  (*Check agmap_elem_agree.*)
+  (*Check agmap_elem_persistent.*)
+  (*Check agmap_elem_timeless.*)
+  (*Check agmap_auth_timeless.*)
+
+  Definition redT γ : semtypeO :=
+    mk_semtype (λ v, ∃ n : nat, ⌜v = #n⌝ ∗ agmap_elem γ n red)%I.
+  Definition blueT γ : semtypeO :=
+    mk_semtype (λ v, ∃ n : nat, ⌜v = #n⌝ ∗ agmap_elem γ n blue)%I.
 
   Definition mkColourGen : expr :=
     let: "c" := ref #0 in
@@ -275,6 +279,6 @@ Section logrel_redblue.
   Lemma mkColourGen_safe :
     TY 0; ∅ ⊨ mkColourGen : (∃: ∃: ((TUnit → #0) × (TUnit → #1)) × (#0 → #1 → TUnit)).
   Proof.
-    (* FIXME exercise *)
+    (* FIXME: exercise *)
   Admitted.
 End logrel_redblue.

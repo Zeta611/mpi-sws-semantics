@@ -25,7 +25,7 @@ Proof.
   iIntros "[>HP HPQ]". by iApply "HPQ".
 Qed.
 
-Check bupd_fupd.
+(*Check bupd_fupd.*)
 
 Lemma fupd_wp' (e : expr) (Φ : val → iProp Σ) s E1 E2 E3:
   (|={E1, E2}=> WP e @ s; E2; E3 {{ Φ }}) -∗ WP e @ s; E1; E3 {{ Φ }}.
@@ -47,7 +47,7 @@ Proof.
   intros. by iApply inv_acc.
 Qed.
 
-Check fupd_mask_frame_r.
+(*Check fupd_mask_frame_r.*)
 
 Lemma fupd_intro_mask E1 E2 P :
   E2 ⊆ E1 →

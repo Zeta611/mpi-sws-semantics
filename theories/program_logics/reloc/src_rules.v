@@ -57,14 +57,14 @@ Definition srcN := relocN .@ "src".
 Definition logN := relocN .@ "log".
 
 (** Interaction lemmas for the ghost theories *)
-Check pointstoS_agree.
-Check heapS_lookup.
-Check heapS_insert.
-Check heapS_update.
-Check heapS_delete.
+(*Check pointstoS_agree.*)
+(*Check heapS_lookup.*)
+(*Check heapS_insert.*)
+(*Check heapS_update.*)
+(*Check heapS_delete.*)
 
-Check exprS_agree.
-Check exprS_update.
+(*Check exprS_agree.*)
+(*Check exprS_update.*)
 
 (** Note that relocGS fixes the two ghost names for [exprS] and [heapS] *)
 

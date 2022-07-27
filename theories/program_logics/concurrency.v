@@ -13,17 +13,17 @@ From iris.prelude Require Import options.
   You can ignore the κs (it relates to another feature, prophecy variables, that we are not going to get into in this course).
   (it corresponds to the notion of "base steps" →_b  in the lecture notes)
  *)
-Check prim_step.
+(*Check prim_step.*)
 (** [step] lifts this reduction to thread pools. *)
-Check step.
+(*Check step.*)
 
-Check ForkS.
+(*Check ForkS.*)
 (** In Iris's HeapLang, CAS is encoded in terms of another primitive: CmpXchg, namely, "compare and exchange".
   The difference to CAS is that it returns not only a Boolean flag (indicating success or failure), but rather
   a pair that also contains the old/current value.
 *)
-Print CAS.
-Check CmpXchgS.
+(*Print CAS.*)
+(*Check CmpXchgS.*)
 
 Global Notation "{{ P } } e {{ Φ } }" := (□(P%I -∗ WP e {{ Φ%I }}))%I
   (at level 20, P, e, Φ at level 200,
@@ -34,9 +34,9 @@ Global Notation "{{ P } } e {{ v , Q } }" := (□ (P%I -∗ WP e {{ v, Q%I }}))%
   format "{{  P  } }  e  {{  v ,  Q  } }") : stdpp_scope.
 
 (** Weakest Precondition Rules *)
-Check wp_cmpxchg_fail.
-Check wp_cmpxchg_suc.
-Check wp_fork.
+(*Check wp_cmpxchg_fail.*)
+(*Check wp_cmpxchg_suc.*)
+(*Check wp_fork.*)
 
 Definition assert (e : expr) : expr :=
   if: e then #() else #0 #0.

@@ -13,23 +13,23 @@ Implicit Types
 (** * Hoare logic *)
 
 (** Entailment rules *)
-Check ent_equiv.
-Check ent_refl.
-Check ent_trans.
+(*Check ent_equiv.*)
+(*Check ent_refl.*)
+(*Check ent_trans.*)
 (* NOTE: True = ⌜True⌝ *)
 (* NOTE: False = ⌜False⌝ *)
-Check ent_prove_pure.
-Check ent_assume_pure.
-Check ent_and_elim_r.
-Check ent_and_elim_l.
-Check ent_and_intro.
-Check ent_or_introl.
-Check ent_or_intror.
-Check ent_or_elim.
-Check ent_all_intro.
-Check ent_all_elim.
-Check ent_exist_intro.
-Check ent_exist_elim.
+(*Check ent_prove_pure.*)
+(*Check ent_assume_pure.*)
+(*Check ent_and_elim_r.*)
+(*Check ent_and_elim_l.*)
+(*Check ent_and_intro.*)
+(*Check ent_or_introl.*)
+(*Check ent_or_intror.*)
+(*Check ent_or_elim.*)
+(*Check ent_all_intro.*)
+(*Check ent_all_elim.*)
+(*Check ent_exist_intro.*)
+(*Check ent_exist_elim.*)
 
 (** Derived entailment rules *)
 Lemma ent_weakening P Q R :
@@ -445,13 +445,13 @@ Proof.
 Admitted.
 
 (** * Separation Logic *)
-Check ent_sep_weaken.
-Check ent_sep_true.
-Check ent_sep_comm.
-Check ent_sep_split.
-Check ent_sep_assoc.
-Check ent_pointsto_sep.
-Check ent_exists_sep.
+(*Check ent_sep_weaken.*)
+(*Check ent_sep_true.*)
+(*Check ent_sep_comm.*)
+(*Check ent_sep_split.*)
+(*Check ent_sep_assoc.*)
+(*Check ent_pointsto_sep.*)
+(*Check ent_exists_sep.*)
 
 (* Note: the separating conjunction can be typed with `\sep` *)
 
@@ -510,10 +510,10 @@ Qed.
 
 
 (** New Hoare rules *)
-Check hoare_frame.
-Check hoare_new.
-Check hoare_store.
-Check hoare_load.
+(*Check hoare_frame.*)
+(*Check hoare_new.*)
+(*Check hoare_store.*)
+(*Check hoare_load.*)
 
 Lemma hoare_pure_pre_sep_l (ϕ : Prop) Q Φ e :
   (ϕ → {{ Q }} e {{ Φ }}) →
