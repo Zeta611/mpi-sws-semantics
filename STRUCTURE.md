@@ -137,4 +137,4 @@ Notes on exercises:
 | 10.3    | `concurrent_logrel/`                                              |
 
 Notes on exercises:
-* The exercise for verifying the channel implementation (Section 10.3) is located in `axiomatic/concurrency.v`.
+* The exercise for verifying the channel implementation (Section 10.3) is located in `concurrency.v`.
