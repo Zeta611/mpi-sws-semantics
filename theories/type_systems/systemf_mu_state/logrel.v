@@ -53,10 +53,10 @@ Coercion of_fotype : fotype >-> type.
 (** Autosubst instances.
   This lets Autosubst do its magic and derive all the substitution functions, etc.
  *)
-Instance Ids_type : Ids type. derive. Defined.
-Instance Rename_type : Rename type. derive. Defined.
-Instance Subst_type : Subst type. derive. Defined.
-Instance SubstLemmas_typer : SubstLemmas type. derive. Qed.
+#[export] Instance Ids_type : Ids type. derive. Defined.
+#[export] Instance Rename_type : Rename type. derive. Defined.
+#[export] Instance Subst_type : Subst type. derive. Defined.
+#[export] Instance SubstLemmas_typer : SubstLemmas type. derive. Qed.
 
 Definition typing_context := gmap string type.
 Implicit Types
@@ -290,7 +290,7 @@ Implicit Types (W : world) (INV : heap_inv).
 (** [W'] extends [W] if [W] is a suffix of [W'] *)
 Definition wext W W' := suffix W W'.
 Notation "W' ⊒ W" := (wext W W') (at level 40).
-Instance wext_preorder : PreOrder wext.
+#[export] Instance wext_preorder : PreOrder wext.
 Proof. apply _. Qed.
 
 (** Satisfaction is defined straightforwardly by recursion.
@@ -459,7 +459,7 @@ Equations type_size (A : type) : nat :=
 (* [ltof A R] defines a well-founded measure on type [A] by using a mapping [R] from [A] to [nat]
   (it lifts the < relation on natural numbers to [A]) *)
 Definition type_lt := ltof type type_size.
-Instance type_lt_wf : WellFounded type_lt.
+#[local] Instance type_lt_wf : WellFounded type_lt.
 Proof. apply well_founded_ltof. Qed.
 
 Inductive type_case : Set :=
@@ -467,11 +467,11 @@ Inductive type_case : Set :=
 Definition type_case_size (c : type_case) : nat :=
   match c with | expr_case => 1 | val_case => 0 end.
 Definition type_case_lt := ltof type_case type_case_size.
-Instance type_case_lt_wf : WellFounded type_case_lt.
+#[local] Instance type_case_lt_wf : WellFounded type_case_lt.
 Proof. apply well_founded_ltof. Qed.
 
 Definition term_rel := Subterm.lexprod nat (type * type_case) lt (Subterm.lexprod type type_case type_lt type_case_lt).
-Instance term_rel_wf : WellFounded term_rel. apply _. Qed.
+#[local] Instance term_rel_wf : WellFounded term_rel. apply _. Qed.
 
 (** *** The logical relation *)
 (** Since the relation is step-indexed now, and the argument that the case for recursive types is well-formed

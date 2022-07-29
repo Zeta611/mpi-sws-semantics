@@ -196,7 +196,7 @@ Definition infinite_exec_pre (inf : exprO -n> iPropO) : exprO -n> iPropO :=
   This ensures that we can take the fixpoint.
    (For contractive definitions, Banach's fixpoint theorem ensures that there is a unique fixpoint).
 *)
-Instance infinite_exec_contractive : Contractive (infinite_exec_pre).
+#[local] Instance infinite_exec_contractive : Contractive (infinite_exec_pre).
 Proof. solve_contractive. Qed.
 Definition infinite_exec := fixpoint infinite_exec_pre.
 

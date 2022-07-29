@@ -98,7 +98,7 @@ Proof.
   revert v; induction e; intros v ?; simplify_option_eq; auto with f_equal.
 Qed.
 
-Instance of_val_inj : Inj (=) (=) of_val.
+#[export] Instance of_val_inj : Inj (=) (=) of_val.
 Proof. by intros ?? Hv; apply (inj Some); rewrite <-!to_of_val, Hv. Qed.
 
 (** structural computational version *)
@@ -408,9 +408,9 @@ Fixpoint is_closed (X : list string) (e : expr) : bool :=
 
 (** [closed] states closedness as a Coq proposition, through the [Is_true] transformer. *)
 Definition closed (X : list string) (e : expr) : Prop := Is_true (is_closed X e).
-Instance closed_proof_irrel X e : ProofIrrel (closed X e).
+#[export] Instance closed_proof_irrel X e : ProofIrrel (closed X e).
 Proof. unfold closed. apply _. Qed.
-Instance closed_dec X e : Decision (closed X e).
+#[export] Instance closed_dec X e : Decision (closed X e).
 Proof. unfold closed. apply _. Defined.
 
 (** closed expressions *)
@@ -724,7 +724,7 @@ Lemma contextual_step_unroll e e':
 Proof. by apply (fill_contextual_step [UnrollCtx]). Qed.
 
 
-#[global]
+#[export]
 Hint Resolve
   contextual_step_app_l contextual_step_app_r contextual_step_binop_l contextual_step_binop_r
   contextual_step_case contextual_step_fst contextual_step_if contextual_step_injl contextual_step_injr

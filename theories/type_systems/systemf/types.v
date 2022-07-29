@@ -22,10 +22,10 @@ Inductive type : Type :=
 (** Autosubst instances.
   This lets Autosubst do its magic and derive all the substitution functions, etc.
  *)
-Instance Ids_type : Ids type. derive. Defined.
-Instance Rename_type : Rename type. derive. Defined.
-Instance Subst_type : Subst type. derive. Defined.
-Instance SubstLemmas_typer : SubstLemmas type. derive. Qed.
+#[export] Instance Ids_type : Ids type. derive. Defined.
+#[export] Instance Rename_type : Rename type. derive. Defined.
+#[export] Instance Subst_type : Subst type. derive. Defined.
+#[export] Instance SubstLemmas_typer : SubstLemmas type. derive. Qed.
 
 Definition typing_context := gmap string type.
 Implicit Types

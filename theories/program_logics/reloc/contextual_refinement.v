@@ -217,14 +217,14 @@ Lemma typed_ctx_typed K Δ Γ A Δ' Γ' B e :
   syn_typed Δ Γ e A → typed_ctx K Δ Γ A Δ' Γ' B → syn_typed Δ' Γ' (fill_ctx K e) B.
 Proof. induction 2; simpl; eauto using typed_ctx_item_typed. Qed.
 
-Instance ctx_refines_reflexive Δ Γ A :
+#[export] Instance ctx_refines_reflexive Δ Γ A :
   Reflexive (fun e1 e2 => ctx_refines Δ Γ e1 e2 A).
 Proof.
   intros e K ????? Hty Hst.
   eexists _,_. apply Hst.
 Qed.
 
-Instance ctx_refines_transitive Δ Γ A :
+#[export] Instance ctx_refines_transitive Δ Γ A :
   Transitive (fun e1 e2 => ctx_refines Δ Γ e1 e2 A).
 Proof.
   intros e1 e2 e3 Hctx1 Hctx2 K σ0 σ1 v1 B Hh Hty Hst.

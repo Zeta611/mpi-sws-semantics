@@ -300,7 +300,8 @@ Proof.
   iApply ent_wp_pure_step; first done. by iApply "IH".
 Qed.
 
-Print hoare.
+(*Print hoare.*)
+
 (** We can re-derive the Hoare rules from the weakest pre rules. *)
 Lemma hoare_frame' P R Φ e :
   {{ P }} e {{ Φ }} →

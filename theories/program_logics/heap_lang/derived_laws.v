@@ -169,4 +169,4 @@ Qed.
 
 End lifting.
 
-Typeclasses Opaque array.
+#[global] Typeclasses Opaque array.

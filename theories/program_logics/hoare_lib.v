@@ -10,7 +10,7 @@ Module hoare.
   (* We make "ghost_state" an axiom for now to simplify the Coq development.
    In the future, we will quantify over it. *)
   Axiom ghost_state: heapGS heapΣ.
-  Existing Instance ghost_state.
+  #[export] Existing Instance ghost_state.
 
   (* the type of preconditions and postconditions *)
   Notation iProp := (iProp heapΣ).

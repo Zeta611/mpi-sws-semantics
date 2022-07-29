@@ -33,8 +33,8 @@ Qed.
   [ Definition idsc (n : nat) (sigma : var → var) (x : var) := if decide (x < n) then x else sigma (x - n). ]
   we declare suitable instances to use [idss] for variable renamings.
 *)
-Instance Ids_var : Ids var. exact id. Defined.
-Instance Rename_var : Rename var. exact id. Defined.
+#[global] Instance Ids_var : Ids var. exact id. Defined.
+#[global] Instance Rename_var : Rename var. exact id. Defined.
 
 (* a lemma for the nat instance *)
 Lemma upren_idss sigma n :

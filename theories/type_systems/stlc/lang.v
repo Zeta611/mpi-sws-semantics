@@ -55,7 +55,7 @@ Qed.
    It is defined as:
     [Inj R S f := ∀ x y, S (f x) (f y) → R x y]
 *)
-Instance of_val_inj : Inj (=) (=) of_val.
+#[export] Instance of_val_inj : Inj (=) (=) of_val.
 Proof. by intros ?? Hv; apply (inj Some); rewrite <-!to_of_val, Hv. Qed.
 
 (* A predicate which holds true whenever an
@@ -269,9 +269,9 @@ Fixpoint is_closed (X : list string) (e : expr) : bool :=
   end.
 
 Notation closed X e := (Is_true (is_closed X e)).
-Instance closed_proof_irrel X e : ProofIrrel (closed X e).
+#[export] Instance closed_proof_irrel X e : ProofIrrel (closed X e).
 Proof. unfold closed. apply _. Qed.
-Instance closed_dec X e : Decision (closed X e).
+#[export] Instance closed_dec X e : Decision (closed X e).
 Proof. unfold closed. apply _. Defined.
 
 Lemma closed_weaken X Y e : closed X e → X ⊆ Y → closed Y e.

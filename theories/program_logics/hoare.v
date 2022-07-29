@@ -529,7 +529,7 @@ Proof.
 Qed.
 
 (* Enables rewriting with equivalences ⊣⊢ in pre/post condition *)
-Instance hoare_proper :
+#[export] Instance hoare_proper :
   Proper (equiv ==> eq ==> (pointwise_relation val (⊢)) ==> impl) hoare.
 Proof.
   intros P1 P2 HP%ent_equiv e1 e2 <- Φ1 Φ2 HΦ Hp.
