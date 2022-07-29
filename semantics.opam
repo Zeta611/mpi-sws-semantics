@@ -1,9 +1,12 @@
 opam-version: "2.0"
 name: "coq-semantics-course"
-license: "BSD"
+license: "BSD-3-Clause"
 maintainer: "Simon Spies, Lennard Gäher"
 authors: "Derek Dreyer, Simon Spies, Lennard Gäher"
 synopsis: "Best course this side of the milky way"
+homepage: "https://plv.mpi-sws.org/semantics-course/"
+bug-reports: "https://gitlab.mpi-sws.org/FP/semantics-course/issues"
+version: "dev"
 
 depends: [
   "coq" { (>= "8.13" & < "8.16~") | (= "dev") }
