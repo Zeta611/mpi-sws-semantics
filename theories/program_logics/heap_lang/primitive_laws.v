@@ -12,7 +12,7 @@ From semantics.pl.program_logic Require Export notation.
 From iris.prelude Require Import options.
 
 Class heapGS Σ := HeapGS {
-  heapGS_invGS : invGS Σ;
+  heapGS_invGS : invGS_gen HasNoLc Σ;
   heapGS_gen_heapGS :> gen_heapGS loc (option val) Σ;
 }.
 

@@ -6,7 +6,7 @@ From iris.prelude Require Import options.
 Import uPred.
 
 Class irisGS (Λ : language) (Σ : gFunctors) := IrisG {
-  iris_invGS :> invGS Σ;
+  iris_invGS :> invGS_gen HasNoLc Σ;
 
   (** The state interpretation is an invariant that should hold in
   between each step of reduction. Here [state Λ] is the global state. *)

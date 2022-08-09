@@ -16,7 +16,7 @@ Proof.
   intros Hlog ??.
   cut (adequate NotStuck e σ (λ _ _, True)); first by intros [_ Hsafe]; eapply Hsafe; eauto.
   eapply (heap_adequacy Σ _).
-  iIntros (??) "_".
+  iIntros (?) "_".
   iApply (wp_wand with "[]").
   - rewrite -(subst_map_empty e).
     iApply (Hlog _ $! trivial_env).

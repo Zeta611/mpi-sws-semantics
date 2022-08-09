@@ -72,7 +72,7 @@ Proof.
   iFrame. iPureIntro. split; first done. lia.
 Qed.
 
-Lemma wp_not_stuck `{!HasNoLc Σ} e σ E Φ :
+Lemma wp_not_stuck e σ E Φ :
   state_interp σ -∗ wp' NotStuck E e Φ ={E}=∗ ⌜not_stuck e σ⌝.
 Proof.
   rewrite wp'_unfold /wp_pre /not_stuck. iIntros "Hσ H".
@@ -81,7 +81,7 @@ Proof.
   iMod (fupd_plain_mask with "H") as %?; eauto.
 Qed.
 
-Lemma wptp_strong_adequacy `{!HasNoLc Σ} Φs s n es1 es2 κs σ1 σ2 :
+Lemma wptp_strong_adequacy Φs s n es1 es2 κs σ1 σ2 :
   nsteps n (es1, σ1) κs (es2, σ2) →
   state_interp σ1 -∗ wptp s es1 Φs
   ={∅,∅}=∗ |={∅}▷=>^n |={∅,∅}=>
@@ -115,7 +115,7 @@ End adequacy.
 
 (** Iris's generic adequacy result *)
 Theorem wp_strong_adequacy Σ Λ `{!invGpreS Σ} e σ1 n κs t2 σ2 φ :
-  (∀ `{Hinv : !invGS Σ} `{!HasNoLc Σ},
+  (∀ `{Hinv : !invGS_gen HasNoLc Σ},
     ⊢ |={⊤}=> ∃
          (s: stuckness)
          (stateI : state Λ → iProp Σ)
@@ -145,11 +145,11 @@ Theorem wp_strong_adequacy Σ Λ `{!invGpreS Σ} e σ1 n κs t2 σ2 φ :
   φ.
 Proof.
   intros Hwp ?.
-  apply (step_fupdN_soundness_no_lc _ n 0)=> Hinv Hlc.
+  apply (step_fupdN_soundness_no_lc _ n 0)=> Hinv.
   iIntros "_".
   iMod Hwp as (s stateI Φ) "(Hσ & Hwp & Hφ)".
   rewrite /wp swp_eq /swp_def. iMod "Hwp".
-  iMod (@wptp_strong_adequacy _ _ (IrisG _ _ Hinv stateI) _ [_]
+  iMod (@wptp_strong_adequacy _ _ (IrisG _ _ Hinv stateI) [_]
     with "[Hσ] [Hwp]") as "H";[ done | done | | ].
   { by iApply big_sepL2_singleton. }
   iAssert (|={∅}▷=>^n |={∅}=> ⌜φ⌝)%I
@@ -203,7 +203,7 @@ Proof.
 Qed.
 
 Corollary wp_adequacy Σ Λ `{!invGpreS Σ} s e σ φ :
-  (∀ `{Hinv : !invGS Σ} `{!HasNoLc Σ},
+  (∀ `{Hinv : !invGS_gen HasNoLc Σ},
      ⊢ |={⊤}=> ∃ (stateI : state Λ → iProp Σ),
        let _ : irisGS Λ Σ := IrisG _ _ Hinv stateI
        in
@@ -211,7 +211,7 @@ Corollary wp_adequacy Σ Λ `{!invGpreS Σ} s e σ φ :
   adequate s e σ (λ v _, φ v).
 Proof.
   intros Hwp. apply adequate_alt; intros t2 σ2 [n [κs ?]]%erased_steps_nsteps.
-  eapply (wp_strong_adequacy Σ _); [|done]=> ??.
+  eapply (wp_strong_adequacy Σ _); [|done]=> ?.
   iMod Hwp as (stateI) "[Hσ Hwp]".
   iExists s, stateI, (λ v, ⌜φ v⌝%I) => /=.
   iIntros "{$Hσ $Hwp} !>" (e2 ->) "% H Hv".
