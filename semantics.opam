@@ -10,8 +10,8 @@ version: "dev"
 
 depends: [
   "coq" { (>= "8.13" & < "8.16~") | (= "dev") }
-  "coq-iris" { (= "dev.2022-08-09.0.4e9a1ec7") | (= "dev") }
-  "coq-iris-heap-lang" { (= "dev.2022-08-09.0.4e9a1ec7") | (= "dev") }
+  "coq-iris" { (= "dev.2022-08-14.0.25e3b14e") | (= "dev") }
+  "coq-iris-heap-lang" { (= "dev.2022-08-14.0.25e3b14e") | (= "dev") }
   "coq-equations" { (= "1.2.4+8.13") | (= "1.3+8.14") | (= "1.3+8.15") }
   "coq-autosubst" { = "1.7" }
 ]

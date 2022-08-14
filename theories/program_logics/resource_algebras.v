@@ -369,16 +369,16 @@ Section frac.
   Lemma frac_op p q : p ⋅ q = (p + q)%Qp.
   Proof. done. Qed.
   Lemma frac_included p q : p ≼ q ↔ (p < q)%Qp.
-  Proof. by rewrite Qp_lt_sum. Qed.
+  Proof. by rewrite Qp.lt_sum. Qed.
 
   Corollary frac_included_weak p q : p ≼ q → (p ≤ q)%Qp.
-  Proof. rewrite frac_included. apply Qp_lt_le_incl. Qed.
+  Proof. rewrite frac_included. apply Qp.lt_le_incl. Qed.
 
   Definition frac_lra_mixin : LRAMixin frac.
   Proof.
     split; try apply _; try done.
     intros p q. rewrite !frac_valid frac_op=> ?.
-    trans (p + q)%Qp; last done. apply Qp_le_add_l.
+    trans (p + q)%Qp; last done. apply Qp.le_add_l.
   Qed.
   Canonical Structure fracR : lra := Lra frac frac_lra_mixin.
 
@@ -386,7 +386,7 @@ Section frac.
     lra_exclusive 1%Qp.
   Proof.
     intros f. rewrite frac_valid frac_op.
-    apply Qp_not_add_le_l.
+    apply Qp.not_add_le_l.
   Qed.
 End frac.
 
