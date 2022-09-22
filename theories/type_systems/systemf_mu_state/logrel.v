@@ -346,7 +346,7 @@ Proof.
   destruct Hincl as (W''& ->).
   exists (length W'' + i).
   rewrite lookup_app_r; last lia.
-  by rewrite minus_plus.
+  by rewrite Nat.add_comm Nat.add_sub.
 Qed.
 
 Lemma wsat_merge σ1 σ2 W1 W2 :

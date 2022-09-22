@@ -153,9 +153,9 @@ Section spin_lock.
 
   (** Lock specification *)
   Definition lockN : namespace := nroot .@ "lock".
-  Definition lock_inv l (P : iProp Σ) :=
+  Definition lock_inv (l : loc) (P : iProp Σ) : iProp Σ :=
     ((l ↦ #false ∗ P) ∨ (l ↦ #true))%I.
-  Definition is_lock v P :=
+  Definition is_lock (v : val) (P : iProp Σ) : iProp Σ :=
     (∃ l : loc, ⌜v = #l⌝ ∗ inv lockN (lock_inv l P))%I.
 
   Instance is_lock_pers v P : Persistent (is_lock v P).
@@ -262,8 +262,8 @@ End lock_lemmas.
 Section excl_spin_lock.
   Context `{heapGS Σ} `{lockG Σ}.
 
-  Definition is_excl_lock v γ P :=
-         is_lock v P 
+  Definition is_excl_lock (v : val) (γ : gname) (P : iProp Σ) : iProp Σ :=
+        is_lock v P (* TODO *)
   .
 
   Instance is_excl_lock_pers v γ  P : Persistent (is_excl_lock v γ P).

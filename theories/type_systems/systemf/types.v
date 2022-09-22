@@ -275,7 +275,7 @@ Proof.
   induction 1 in δ |-*; intros Hmon; simpl; eauto.
   all: econstructor; eapply type_wf_mono; first eapply IHtype_wf; last done.
   all: intros i j Hlt; destruct i, j; simpl; try lia.
-  all: by eapply lt_n_S, Hmon, lt_S_n.
+  all: rewrite -Nat.succ_lt_mono; eapply Hmon; lia.
 Qed.
 
 (** [A.[σ]], i.e. [A] with the substitution [σ] applied to it, is well-formed under [m] if
@@ -290,12 +290,12 @@ Proof.
   + econstructor; eapply IHtype_wf.
     intros [|x]; rewrite /up //=.
     - econstructor. lia.
-    - intros Hlt % lt_S_n. eapply type_wf_rename; eauto.
+    - intros Hlt % Nat.succ_lt_mono. eapply type_wf_rename; eauto.
       intros i j Hlt'; simpl; lia.
   + econstructor; eapply IHtype_wf.
     intros [|x]; rewrite /up //=.
     - econstructor. lia.
-    - intros Hlt % lt_S_n. eapply type_wf_rename; eauto.
+    - intros Hlt % Nat.succ_lt_mono. eapply type_wf_rename; eauto.
       intros i j Hlt'; simpl; lia.
 Qed.
 
