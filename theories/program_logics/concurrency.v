@@ -1,5 +1,6 @@
 From iris.proofmode Require Import tactics.
 From iris.heap_lang Require Import lang notation.
+From iris.bi Require Import fractional.
 From iris.base_logic Require Import invariants.
 From iris.heap_lang Require Export primitive_laws proofmode.
 From iris.algebra Require Import excl auth numbers.
@@ -40,7 +41,6 @@ Global Notation "{{ P } } e {{ v , Q } }" := (□ (P%I -∗ WP e {{ v, Q%I }}))%
 
 Definition assert (e : expr) : expr :=
   if: e then #() else #0 #0.
-
 
 Section cas.
   Context `{heapGS Σ}.
@@ -225,14 +225,13 @@ Definition with_lock' e1 e2 := (with_lock (e1: expr) (λ: <>, e2)%E).
 Section with_lock.
   Context `{heapGS Σ}.
 
-  (* TODO: exercise *)
   Lemma with_lock_spec Φ (l c : val) P :
     is_lock l P -∗
     (P -∗ WP c #() {{ v, P ∗ Φ v }}) -∗
     WP with_lock l c {{ Φ }}.
   Proof.
-    (* FIXME exercise for you *)
-   Admitted.
+    (* FIXME: exercise *)
+  Admitted.
 End with_lock.
 
 (** Exclusive Ghost Token *)
@@ -263,8 +262,9 @@ End lock_lemmas.
 Section excl_spin_lock.
   Context `{heapGS Σ} `{lockG Σ}.
 
-  Definition is_excl_lock v (γ : gname) P : iProp Σ :=
-    is_lock v P. (* FIXME *)
+  Definition is_excl_lock v γ P :=
+         is_lock v P 
+  .
 
   Instance is_excl_lock_pers v γ  P : Persistent (is_excl_lock v γ P).
   Proof. apply _. Qed.
@@ -272,27 +272,28 @@ Section excl_spin_lock.
   Lemma newlock_spec' P :
     ⊢ {{ P }} newlock #() {{ v, ∃ γ, is_excl_lock v γ P }}.
   Proof.
-    (* FIXME *)
+    (* FIXME: exercise *)
   Admitted.
 
   Lemma acquire_spec' v γ P :
     ⊢ {{ is_excl_lock v γ P }} acquire v {{ w, ⌜w = #()⌝ ∗ locked γ ∗ P }}.
   Proof.
-    (* FIXME *)
+    (* FIXME: exercise *)
   Admitted.
 
   Lemma release_spec' v γ P :
     ⊢ {{ is_excl_lock v γ P ∗ locked γ ∗ P }} release v {{ w, True }}.
   Proof.
-    (* FIXME *)
+    (* FIXME: exercise *)
   Admitted.
 
   Lemma really_exclusive v γ P :
     ⊢ {{ is_excl_lock v γ P ∗ locked γ }} assert (!v = #true) {{ _, True }}.
   Proof.
-    (* FIXME *)
+    (* FIXME: exercise *)
   Admitted.
 End excl_spin_lock.
+
 
 (** Parallel composition *)
 Definition await : val :=
@@ -316,7 +317,7 @@ Section para_comp.
     WP e2 #() {{ _, Q2 }} -∗
     WP comp e1 e2 {{ _, Q1 ∗ Q2 }}.
   Proof using Type*.
-    (* FIXME *)
+    (* FIXME: exercise *)
   Admitted.
 End para_comp.
 
@@ -332,6 +333,7 @@ Definition parallel_counter : expr :=
 Section counter.
   Context `{heapGS Σ} `{lockG Σ} `{ghost_varG Σ nat}.
 
+
   (** You may find the GhostVariable algebra useful.
     Iris already provides it, and you can use the following lemmas.
    *)
@@ -339,20 +341,17 @@ Section counter.
   (*Check ghost_var_agree.*)
   (*Check ghost_var_update.*)
   (* Note: Iris supports splitting a ghost variable into halves via the usual destruct patterns.
-    For example:
-   *)
+    For example: *)
   Lemma gvar_split_halves γ (a : nat) :
     ghost_var γ 1 a -∗ ghost_var γ (1/2) a ∗ ghost_var γ (1/2) a.
   Proof.
     iIntros "[H1 H2]". iFrame.
   Qed.
 
-  (* TODO exercise *)
-  (* TODO put hint about ghost_var here *)
   Lemma parallel_counter_spec :
     ⊢ {{ True }} parallel_counter {{ v, ⌜v = #2⌝ }}.
   Proof using Type*.
-    (* FIXME *)
+    (* FIXME: exercise *)
   Admitted.
 End counter.
 
@@ -364,19 +363,19 @@ Definition acquire_mutex : val :=
 
 Section mutex.
   Context `{heapGS Σ}.
-  (* TODO this is an exercise *)
 
   Notation "l '↦:' P" := (∃ v : val, l ↦ v ∗ P v)%I (at level 40) : stdpp_scope.
 
   Definition is_mutex (v : val) (P : val → iProp Σ) : iProp Σ :=
-    True (* FIXME *).
+         True 
+  .
   Instance is_mutex_pers v P : Persistent (is_mutex v P).
   Proof. apply _. Qed.
 
   Lemma mkmutex_spec P (v : val) :
     ⊢ {{ P v }} mkmutex v {{ v, is_mutex v P }}.
   Proof.
-    (* FIXME *)
+    (* FIXME: exercise *)
   Admitted.
 
   Lemma acquire_mutex_spec P (v : val) :
@@ -384,7 +383,7 @@ Section mutex.
         acquire_mutex v
       {{ w, ∃ (l : loc) (rl : val), ⌜w = (#l, rl)%V⌝ ∗ l ↦: P ∗ {{ l ↦: P }} rl #() {{ _, True }} }}.
   Proof.
-    (* FIXME *)
+    (* FIXME: exercise *)
   Admitted.
 End mutex.
 
@@ -510,12 +509,12 @@ Section channel_spec.
   Lemma send_spec v d :
     ⊢ {{ is_channel v ∗ Pc d }} send v d {{ v, ⌜v = #()⌝ }}.
   Proof using Pers.
-    (* FIXME *)
+    (* FIXME: exercise *)
   Admitted.
 
   Lemma receive_spec v :
     ⊢ {{ is_channel v }} receive v {{ d, Pc d }}.
   Proof using Pers.
-    (* FIXME *)
+    (* FIXME: exercise *)
   Admitted.
 End channel_spec.

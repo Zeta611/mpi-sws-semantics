@@ -72,7 +72,7 @@ Lemma src_expr_step_pure `{relocGS Σ} (ϕ : Prop) n e1 e2 K E :
   src_expr (fill K e1) ={E}=∗ src_expr (fill K e2).
 Proof.
   iIntros (Hphi Hpure ?) "(#CTX & Hs)".
-  iFrame "CTX". by iApply src_step_pures.
+  iFrame "CTX". iApply src_step_pures; [ | done..]; done.
 Qed.
 
 Lemma tac_src_pure `{relocGS Σ} e K' e1 e2 Δ1 E1 i1 e' ϕ ψ Q n :
