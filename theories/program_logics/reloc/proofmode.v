@@ -113,9 +113,9 @@ Tactic Notation "src_pure" open_constr(ef) :=
     reshape_expr e ltac:(fun K e' =>
       unify e' ef;
       eapply (tac_src_pure (fill K' e) (K++K') e');
-      [by rewrite ?fill_app | iSolveTC | ..])
+      [by rewrite ?fill_app | tc_solve | ..])
   end;
-  [iSolveTC || fail "src_pure: cannot eliminate modality in the goal"
+  [tc_solve || fail "src_pure: cannot eliminate modality in the goal"
   |solve_ndisj || fail "src_pure: cannot prove 'nclose specN ⊆ ?'"
   |iAssumptionCore || fail "src_pure: cannot find the RHS"
   |try (exact I || reflexivity) (* ψ *)
@@ -191,11 +191,11 @@ Qed.
 Tactic Notation "src_store" :=
   iStartProof;
   eapply (tac_src_store);
-  [iSolveTC || fail "src_store: cannot eliminate modality in the goal"
+  [tc_solve || fail "src_store: cannot eliminate modality in the goal"
   |solve_ndisj || fail "src_store: cannot prove 'nclose specN ⊆ ?'"
   |iAssumptionCore || fail "src_store: cannot find RHS"
   |src_bind_helper
-  |iSolveTC || fail "src_store: cannot convert the argument to a value"
+  |tc_solve || fail "src_store: cannot convert the argument to a value"
   |simpl; reflexivity || fail "src_store: this should not happen"
   |iAssumptionCore || fail "src_store: cannot find '? ↦ₛ ?'"
   |pm_reduce (* new goal *)].
@@ -243,7 +243,7 @@ Qed.
 Tactic Notation "src_load" :=
   iStartProof;
   eapply (tac_src_load);
-  [iSolveTC || fail "src_load: cannot eliminate modality in the goal"
+  [tc_solve || fail "src_load: cannot eliminate modality in the goal"
   |solve_ndisj || fail "src_load: cannot prove 'nclose specN ⊆ ?'"
   |iAssumptionCore || fail "src_load: cannot find the RHS"
   |src_bind_helper
@@ -298,11 +298,11 @@ Tactic Notation "src_alloc" ident(l) "as" constr(H) :=
         | (iIntros H; src_normalise) || fail 1 "src_alloc:" H "not correct intro pattern" ] in
   iStartProof;
   eapply (tac_src_alloc);
-  [iSolveTC || fail "src_alloc: cannot eliminate modality in the goal"
+  [tc_solve || fail "src_alloc: cannot eliminate modality in the goal"
   |solve_ndisj || fail "src_alloc: cannot prove 'nclose specN ⊆ ?'"
   |iAssumptionCore || fail "src_alloc: cannot find the RHS"
   |src_bind_helper
-  |iSolveTC || fail "src_alloc: expressions is not a value"
+  |tc_solve || fail "src_alloc: expressions is not a value"
   |finish ()
 (* new goal *)].
 
