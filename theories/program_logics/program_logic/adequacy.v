@@ -145,6 +145,7 @@ Theorem wp_strong_adequacy Σ Λ `{!invGpreS Σ} e σ1 n κs t2 σ2 φ :
   φ.
 Proof.
   intros Hwp ?.
+  eapply pure_soundness.
   apply (step_fupdN_soundness_no_lc _ n 0)=> Hinv.
   iIntros "_".
   iMod Hwp as (s stateI Φ) "(Hσ & Hwp & Hφ)".
