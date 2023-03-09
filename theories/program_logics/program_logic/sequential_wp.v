@@ -72,7 +72,7 @@ Proof.
   (* FIXME: reflexivity, as being called many times by f_equiv and f_contractive
   is very slow here *)
   do 22 (f_contractive || f_equiv).
-  rewrite IH; [done | lia | ]. intros v. eapply dist_S, HΦ.
+  rewrite IH; [done | lia | ]. intros v. eapply dist_lt; done.
 Qed.
 Global Instance wp'_proper s E e :
   Proper (pointwise_relation _ (≡) ==> (≡)) (wp' s E e).
