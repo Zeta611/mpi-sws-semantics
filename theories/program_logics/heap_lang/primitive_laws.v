@@ -97,10 +97,10 @@ Proof.
   rewrite big_opM_union; last first.
   { apply map_disjoint_spec=> l' v1 v2 /lookup_singleton_Some [-> _].
     intros (j&w&?&Hjl&_)%heap_array_lookup.
-    rewrite loc_add_assoc -{1}[l']loc_add_0 in Hjl. simplify_eq; lia. }
-  rewrite loc_add_0 -fmap_S_seq big_sepL_fmap.
+    rewrite Loc.add_assoc -{1}[l']Loc.add_0 in Hjl. simplify_eq; lia. }
+  rewrite Loc.add_0 -fmap_S_seq big_sepL_fmap.
   setoid_rewrite Nat2Z.inj_succ. setoid_rewrite <-Z.add_1_l.
-  setoid_rewrite <-loc_add_assoc.
+  setoid_rewrite <-Loc.add_assoc.
   rewrite big_opM_singleton; iDestruct "Hvs" as "[$ Hvs]". by iApply "IH".
 Qed.
 
@@ -128,7 +128,7 @@ Lemma wp_alloc s E v Φ :
   WP Alloc (Val v) @ s; E; E {{ Φ }}.
 Proof.
   iIntros "HΦ". iApply wp_allocN_seq; [auto with lia..|].
-  iIntros "!>" (l) "/= (? & _)". rewrite loc_add_0. iApply "HΦ"; iFrame.
+  iIntros "!>" (l) "/= (? & _)". rewrite Loc.add_0. iApply "HΦ"; iFrame.
 Qed.
 
 Lemma wp_free s E l v Φ :

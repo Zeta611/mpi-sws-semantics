@@ -53,20 +53,20 @@ Lemma array_nil l dq : l ↦∗{dq} [] ⊣⊢ emp.
 Proof. by rewrite /array. Qed.
 
 Lemma array_singleton l dq v : l ↦∗{dq} [v] ⊣⊢ l ↦{dq} v.
-Proof. by rewrite /array /= right_id loc_add_0. Qed.
+Proof. by rewrite /array /= right_id Loc.add_0. Qed.
 
 Lemma array_app l dq vs ws :
   l ↦∗{dq} (vs ++ ws) ⊣⊢ l ↦∗{dq} vs ∗ (l +ₗ length vs) ↦∗{dq} ws.
 Proof.
   rewrite /array big_sepL_app.
   setoid_rewrite Nat2Z.inj_add.
-  by setoid_rewrite loc_add_assoc.
+  by setoid_rewrite Loc.add_assoc.
 Qed.
 
 Lemma array_cons l dq v vs : l ↦∗{dq} (v :: vs) ⊣⊢ l ↦{dq} v ∗ (l +ₗ 1) ↦∗{dq} vs.
 Proof.
-  rewrite /array big_sepL_cons loc_add_0.
-  setoid_rewrite loc_add_assoc.
+  rewrite /array big_sepL_cons Loc.add_0.
+  setoid_rewrite Loc.add_assoc.
   setoid_rewrite Nat2Z.inj_succ.
   by setoid_rewrite Z.add_1_l.
 Qed.
@@ -104,7 +104,7 @@ Proof.
   { done. }
   iIntros "[$ Hl]". rewrite -fmap_S_seq big_sepL_fmap.
   setoid_rewrite Nat2Z.inj_succ. setoid_rewrite <-Z.add_1_l.
-  setoid_rewrite <-loc_add_assoc. iApply "IH". done.
+  setoid_rewrite <-Loc.add_assoc. iApply "IH". done.
 Qed.
 
 Lemma wp_allocN s E v n Φ :

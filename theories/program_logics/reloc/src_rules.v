@@ -224,7 +224,7 @@ Section rules.
     You will find the following lemmas relating to memory allocation helpful:
     - alloc_fresh
     - state_init_heap_singleton
-    - fresh_locs_fresh
+    - Loc.fresh_fresh
     - not_elem_of_dom
     - loc_add_0_l
      *)
