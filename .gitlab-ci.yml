@@ -29,7 +29,7 @@ variables:
 
 ## Build jobs
 
-# build against known-working Coq 8.16.0
+# build against known-working Coq 8.17.0
 build-coq.8.17.0:
   <<: *template
   variables:
