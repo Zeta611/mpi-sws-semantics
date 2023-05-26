@@ -237,7 +237,8 @@ End with_lock.
 (** Exclusive Ghost Token *)
 Definition lockR : cmra := exclR unitO.
 Class lockG Σ :=
-  LockG { lockG_inG :> inG Σ lockR; }.
+  LockG { lockG_inG : inG Σ lockR; }.
+#[export] Existing Instance lockG_inG.
 Definition lockΣ : gFunctors := #[ GFunctor lockR ].
 Global Instance subG_lockΣ Σ : subG lockΣ Σ → lockG Σ.
 Proof. solve_inG. Qed.

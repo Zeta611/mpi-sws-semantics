@@ -89,13 +89,14 @@ Fixpoint is_val (e : expr) : Prop :=
   end.
 Lemma is_val_spec e : is_val e ↔ ∃ v, to_val e = Some v.
 Proof.
-  induction e; simpl; (split; [ | intros (v & Heq)]); simplify_option_eq; try done; eauto.
-  - rewrite IHe1, IHe2. intros [(v1 & ->) (v2 & ->)]. eauto.
-  - rewrite IHe1, IHe2. eauto.
-  - rewrite IHe. intros (v & ->). eauto.
-  - apply IHe. eauto.
-  - rewrite IHe. intros (v & ->); eauto.
-  - apply IHe. eauto.
+  induction e as [ | | ? e IH | e1 IH1 e2 IH2 | ? e1 IH1 e2 IH2 | e1 IH1 e2 IH2 | e IH | e IH | e IH | e IH | e1 IH1 e2 IH2 e3 IH3];
+    simpl; (split; [ | intros (v & Heq)]); simplify_option_eq; try done; eauto.
+  - rewrite IH1, IH2. intros [(v1 & ->) (v2 & ->)]. eauto.
+  - rewrite IH1, IH2. eauto.
+  - rewrite IH. intros (v & ->). eauto.
+  - apply IH. eauto.
+  - rewrite IH. intros (v & ->); eauto.
+  - apply IH. eauto.
 Qed.
 
 Ltac simplify_val :=

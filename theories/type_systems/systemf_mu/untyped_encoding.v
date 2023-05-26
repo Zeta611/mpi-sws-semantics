@@ -63,7 +63,7 @@ Lemma Ω_loops:
 Proof.
   econstructor 2; [|econstructor 1].
   - rewrite /Ω /ω. eauto.
-  - rewrite /Ω. eauto. eapply app_step_beta; eauto.
+  - rewrite /Ω. eauto.
 Qed.
 
 Lemma ω_typed :

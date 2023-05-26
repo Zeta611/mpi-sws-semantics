@@ -21,7 +21,7 @@ Lemma up_idss `{Ids X} `{Rename X} (sigma : var → X) n :
   up (idss n sigma) = idss (S n) (sigma >>> rename (+1) ).
 Proof.
   intros Hren_law.
-  f_ext. intros x. destruct x; unfold idss; simpl; first done.
+  f_ext. intros x. destruct x as [ | x]; unfold idss; simpl; first done.
   unfold up. simpl.
   destruct (decide (x < n)).
   - rewrite decide_True; last lia. apply Hren_law.
@@ -40,7 +40,7 @@ Qed.
 Lemma upren_idss sigma n :
   upren (idss n sigma) = idss (S n) (sigma >>> S).
 Proof.
-  f_ext. intros x. destruct x; unfold idss; simpl; first done.
+  f_ext. intros x. destruct x as [ | x]; unfold idss; simpl; first done.
   destruct (decide (x < n)).
   - rewrite decide_True; [done | lia ].
   - rewrite decide_False; lia.

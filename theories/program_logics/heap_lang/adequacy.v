@@ -6,9 +6,11 @@ From semantics.pl.heap_lang Require Export proofmode.
 From iris.prelude Require Import options.
 
 Class heapGpreS Σ := HeapGpreS {
-  heapGpreS_iris :> invGpreS Σ;
-  heapGpreS_heap :> gen_heapGpreS loc (option val) Σ;
+  heapGpreS_iris : invGpreS Σ;
+  heapGpreS_heap : gen_heapGpreS loc (option val) Σ;
 }.
+#[export] Existing Instance heapGpreS_iris.
+#[export] Existing Instance heapGpreS_heap.
 
 Definition heapΣ : gFunctors :=
   #[invΣ; gen_heapΣ loc (option val)].

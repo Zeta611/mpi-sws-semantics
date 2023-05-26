@@ -9,18 +9,24 @@ From iris Require Import prelude.
 
 
 Class reloc_preGS Σ := RelocPreGS {
-  reloc_preGS_heapG :> heapGpreS Σ;
-  reloc_preGS_sheapG :> ghost_mapG Σ loc (option val);
-  reloc_preGS_sexprG :> ghost_varG Σ expr;
+  reloc_preGS_heapG : heapGpreS Σ;
+  reloc_preGS_sheapG : ghost_mapG Σ loc (option val);
+  reloc_preGS_sexprG : ghost_varG Σ expr;
 }.
+#[export] Existing Instance reloc_preGS_heapG.
+#[export] Existing Instance reloc_preGS_sheapG.
+#[export] Existing Instance reloc_preGS_sexprG.
 
 Class relocGS Σ := RelocGS {
-  relocGS_heapG :> heapGS Σ;
-  relocGS_sheapG :> ghost_mapG Σ loc (option val);
-  relocGS_sexprG :> ghost_varG Σ expr;
+  relocGS_heapG : heapGS Σ;
+  relocGS_sheapG : ghost_mapG Σ loc (option val);
+  relocGS_sexprG : ghost_varG Σ expr;
   relocGS_sexpr_name : gname;
   relocGS_sheap_name : gname;
 }.
+#[export] Existing Instance relocGS_heapG.
+#[export] Existing Instance relocGS_sheapG.
+#[export] Existing Instance relocGS_sexprG.
 
 Definition relocΣ : gFunctors := #[heapΣ; ghost_mapΣ loc (option val); ghost_varΣ expr].
 Global Instance subG_relocΣ Σ : subG relocΣ Σ → reloc_preGS Σ.

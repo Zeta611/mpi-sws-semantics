@@ -13,8 +13,9 @@ From iris.prelude Require Import options.
 
 Class heapGS Σ := HeapGS {
   heapGS_invGS : invGS_gen HasNoLc Σ;
-  heapGS_gen_heapGS :> gen_heapGS loc (option val) Σ;
+  heapGS_gen_heapGS : gen_heapGS loc (option val) Σ;
 }.
+#[export] Existing Instance heapGS_gen_heapGS.
 
 Global Instance heapGS_irisGS `{!heapGS Σ} : irisGS heap_lang Σ := {
   iris_invGS := heapGS_invGS;

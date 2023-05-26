@@ -175,9 +175,9 @@ Implicit Types v : val.
 Implicit Types z : Z.
 
 Lemma wand_apply' (P R Q : iProp Σ) :
-  (P -∗ R) →
+  (P ⊢ R) →
   (R -∗ Q) →
-  P -∗ Q.
+  P ⊢ Q.
 Proof.
   intros Ha Hb. iIntros "HP". iApply Hb. iApply Ha. done.
 Qed.
@@ -229,7 +229,7 @@ Lemma tac_wp_free Δ Δ' s E1 E2 i K l v Φ :
   envs_entails Δ (WP fill K (Free (LitV l)) @ s; E1; E2 {{ Φ }}).
 Proof.
   rewrite envs_entails_unseal=> ? Hlk Hfin.
-  rewrite -wp_bind. eapply wand_apply; first exact: wp_free.
+  rewrite -wp_bind. eapply wand_apply; first apply wand_entails, wp_free.
   rewrite into_laterN_env_sound -later_sep envs_lookup_split //; simpl.
   rewrite -Hfin wand_elim_r (envs_lookup_sound' _ _ _ _ _ Hlk).
   by apply later_mono, sep_mono_r.
@@ -242,7 +242,7 @@ Lemma tac_wp_load Δ Δ' s E1 E2 i K b l q v Φ :
   envs_entails Δ (WP fill K (Load (LitV l)) @ s; E1; E2 {{ Φ }}).
 Proof.
   rewrite envs_entails_unseal=> ?? Hi.
-  rewrite -wp_bind. eapply wand_apply; first exact: wp_load.
+  rewrite -wp_bind. eapply wand_apply; first apply wand_entails, wp_load.
   rewrite into_laterN_env_sound -later_sep envs_lookup_split //; simpl.
   apply later_mono.
   destruct b; simpl.
@@ -261,7 +261,7 @@ Lemma tac_wp_store Δ Δ' s E1 E2 i K l v v' Φ :
 Proof.
   rewrite envs_entails_unseal=> ???.
   destruct (envs_simple_replace _ _ _) as [Δ''|] eqn:HΔ''; [ | contradiction ].
-  rewrite -wp_bind. eapply wand_apply; first by eapply wp_store.
+  rewrite -wp_bind. eapply wand_apply; first apply wand_entails, wp_store.
   rewrite into_laterN_env_sound -later_sep envs_simple_replace_sound //; simpl.
   rewrite right_id. by apply later_mono, sep_mono_r, wand_mono.
 Qed.

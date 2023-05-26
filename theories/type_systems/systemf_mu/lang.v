@@ -116,17 +116,13 @@ Fixpoint is_val (e : expr) : Prop :=
   end.
 Lemma is_val_spec e : is_val e ↔ ∃ v, to_val e = Some v.
 Proof.
-  induction e; simpl; (split; [ | intros (v & Heq)]); simplify_option_eq; try done; eauto.
-  - rewrite IHe. intros (v & ->); eauto.
-  - apply IHe. eauto.
-  - rewrite IHe1, IHe2. intros [(v1 & ->) (v2 & ->)]. eauto.
-  - rewrite IHe1, IHe2. eauto.
-  - rewrite IHe. intros (v & ->). eauto.
-  - apply IHe. eauto.
-  - rewrite IHe. intros (v & ->); eauto.
-  - apply IHe. eauto.
-  - rewrite IHe. intros (v & ->). eauto.
-  - apply IHe. eauto.
+  induction e as [ | | ? e IH | e1 IH1 e2 IH2 | e IH | ? e1 IH1 e2 IH2 | e1 IH1 e2 IH2 e3 IH3 | e IH | e IH | e IH | ? e1 IH1 e2 IH2 | e1 IH1 e2 IH2 | e IH | e IH | e IH | e IH | e1 IH1 e2 IH2 e3 IH3 | e IH | e IH];
+    simpl; (split; [ | intros (v & Heq)]); simplify_option_eq; try naive_solver.
+  - rewrite IH. intros (v & ->). eauto.
+  - rewrite IH1, IH2. intros [(v1 & ->) (v2 & ->)]. eauto.
+  - rewrite IH. intros (v & ->). eauto.
+  - rewrite IH. intros (v & ->); eauto.
+  - rewrite IH. intros (v & ->). eauto.
 Qed.
 
 Global Instance base_lit_eq_dec : EqDecision base_lit.

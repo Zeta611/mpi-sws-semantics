@@ -258,24 +258,24 @@ Lemma type_wf_subst_dom σ τ n A:
   (∀ m, m < n → σ m = τ m) →
   A.[σ] = A.[τ].
 Proof.
-  induction 1 in σ, τ |-*; simpl; eauto.
+  induction 1 as [ | | | | ? A HA IH | ? A HA IH | ? A B HA IHA HB IHB | ? A B HA IHA HB IHB | ? A B HA IHA HB IHB | ? A HA IH | ? A HA IH] in σ, τ |-*; simpl; eauto.
   - (* tforall *)
     intros Heq; asimpl. f_equal.
-    eapply IHtype_wf; intros [|m]; rewrite /up; simpl; first done.
+    eapply IH; intros [|m]; rewrite /up; simpl; first done.
     intros Hlt. f_equal. eapply Heq. lia.
   - (* texists *)
     intros Heq; asimpl. f_equal.
-    eapply IHtype_wf. intros [ | m]; rewrite /up; simpl; first done.
+    eapply IH. intros [ | m]; rewrite /up; simpl; first done.
     intros Hlt. f_equal. apply Heq. lia.
   - (* fun *) intros ?. f_equal; eauto.
   - (* prod *) intros ?. f_equal; eauto.
   - (* sum *) intros ?. f_equal; eauto.
   - (* rec *)
     intros Heq; asimpl. f_equal.
-    eapply IHtype_wf; intros [|m]; rewrite /up; simpl; first done.
+    eapply IH; intros [|m]; rewrite /up; simpl; first done.
     intros Hlt. f_equal. eapply Heq. lia.
   - (* ref *)
-    intros ?. f_equal. eapply IHtype_wf. done.
+    intros ?. f_equal. eapply IH. done.
 Qed.
 
 Lemma type_wf_closed A σ:

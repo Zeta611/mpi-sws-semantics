@@ -1613,7 +1613,8 @@ Canonical Structure prodCR (A B : lra) : cmra := cmra_of_lra (prod' A B) (prod_l
 
 (** We need this to register the ghost state we setup with Iris. *)
 Class mono_natG Σ :=
-  MonoNatG { mono_natG_inG :> inG Σ (authCR max_natUR); }.
+  MonoNatG { mono_natG_inG : inG Σ (authCR max_natUR); }.
+#[export] Existing Instance mono_natG_inG.
 Definition mono_natΣ : gFunctors := #[ GFunctor (authCR max_natUR) ].
 Global Instance subG_mono_natΣ Σ : subG mono_natΣ Σ → mono_natG Σ.
 Proof. solve_inG. Qed.
@@ -1668,7 +1669,8 @@ End mono_nat.
 
 (** ** Exercise: Oneshot *)
 Class oneshotG Σ (A : Type) `{Countable A} :=
-  OneShotG { oneshotG_inG :> inG Σ (csumCR (exclR unit) (agreeR A)); }.
+  OneShotG { oneshotG_inG : inG Σ (csumCR (exclR unit) (agreeR A)); }.
+#[export] Existing Instance oneshotG_inG.
 Definition oneshotΣ A `{Countable A} : gFunctors := #[ GFunctor (csumCR (exclR unit) (agreeR A)) ].
 Global Instance subG_oneshotΣ Σ A `{Countable A} : subG (oneshotΣ A) Σ → oneshotG Σ A.
 Proof. solve_inG. Qed.
@@ -1722,7 +1724,8 @@ End oneshot.
 
 (** ** Exercise: Synchronized Ghost State *)
 Class halvesG Σ (A : Type) :=
-  HalvesG { halvesG_inG :> inG Σ (authCR (optionUR (exclR A))); }.
+  HalvesG { halvesG_inG : inG Σ (authCR (optionUR (exclR A))); }.
+#[export] Existing Instance halvesG_inG.
 Definition halvesΣ A : gFunctors := #[ GFunctor (authCR (optionUR (exclR A))) ].
 Global Instance subG_halvesΣ Σ A : subG (halvesΣ A) Σ → halvesG Σ A.
 Proof. solve_inG. Qed.
@@ -1758,7 +1761,8 @@ Section halves.
 End halves.
 
 (** ** Exercise: gvar *)
-Class gvarG Σ (A : Type) `{Countable A} := GvarG { gvarG_inG :> inG Σ (prodCR fracR (agreeR A)); }.
+Class gvarG Σ (A : Type) `{Countable A} := GvarG { gvarG_inG : inG Σ (prodCR fracR (agreeR A)); }.
+#[export] Existing Instance gvarG_inG.
 Definition gvarΣ A `{Countable A} : gFunctors := #[ GFunctor (prodCR fracR (agreeR A)) ].
 Global Instance subG_gvarΣ Σ A `{Countable A} : subG (gvarΣ A) Σ → gvarG Σ A.
 Proof. solve_inG. Qed.
@@ -1817,7 +1821,8 @@ End gvar.
 (** Agreement maps *)
 Definition agmapCR (A B : Type) `{Countable A} `{Countable B} := (authCR (gmapUR A (agreeR B))).
 Class agmapG Σ (A B : Type) `{Countable A} `{Countable B} :=
-  AgMapG { agmapG_inG :> inG Σ (agmapCR A B); }.
+  AgMapG { agmapG_inG : inG Σ (agmapCR A B); }.
+#[export] Existing Instance agmapG_inG.
 Definition agmapΣ A B `{Countable A} `{Countable B} : gFunctors := #[ GFunctor (agmapCR A B) ].
 Global Instance subG_agmapΣ Σ A B `{Countable A} `{Countable B} : subG (agmapΣ A B) Σ → agmapG Σ A B.
 Proof. solve_inG. Qed.
@@ -1867,7 +1872,8 @@ End agmap.
 (** Updateable maps *)
 Definition exmapCR (A B : Type) `{Countable A} := (authCR (gmapUR A (exclR B))).
 Class exmapG Σ (A B : Type) `{Countable A} :=
-  ExMapG { exmapG_inG :> inG Σ (exmapCR A B); }.
+  ExMapG { exmapG_inG : inG Σ (exmapCR A B); }.
+#[export] Existing Instance exmapG_inG.
 Definition exmapΣ A B `{Countable A} : gFunctors := #[ GFunctor (exmapCR A B) ].
 Global Instance subG_exmapΣ Σ A B `{Countable A} : subG (exmapΣ A B) Σ → exmapG Σ A B.
 Proof. solve_inG. Qed.

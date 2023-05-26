@@ -89,7 +89,8 @@ End mononat.
 
 
 (** Half algebra: provides two halves *)
-Class halvesG Σ (A : Type) := HalvesG { halvesG_ghost_varG :> ghost_varG Σ A; }.
+Class halvesG Σ (A : Type) := HalvesG { halvesG_ghost_varG : ghost_varG Σ A; }.
+#[export] Existing Instance halvesG_ghost_varG.
 Definition halvesΣ A : gFunctors := ghost_varΣ A.
 Global Instance subG_halvesΣ Σ A : subG (halvesΣ A) Σ → halvesG Σ A.
 Proof. solve_inG. Qed.
@@ -132,7 +133,8 @@ Notation "'right'" := (ghalf) (only parsing).
 
 (** One shot *)
 Class oneshotG Σ (A : Type) :=
-  OneShotG { oneshotG_inG :> inG Σ (csumR (exclR unitO) (agreeR (leibnizO A))); }.
+  OneShotG { oneshotG_inG : inG Σ (csumR (exclR unitO) (agreeR (leibnizO A))); }.
+#[export] Existing Instance oneshotG_inG.
 Definition oneshotΣ A : gFunctors := #[ GFunctor (csumR (exclR unitO) (agreeR (leibnizO A))) ].
 Global Instance subG_oneshotΣ Σ A : subG (oneshotΣ A) Σ → oneshotG Σ A.
 Proof. solve_inG. Qed.
@@ -161,7 +163,7 @@ Section oneshot.
     os_pending γ -∗ |==> os_shot γ a.
   Proof.
     rewrite os_pending_eq os_shot_eq.
-    apply own_update.
+    iApply own_update.
     apply cmra_update_exclusive.
     done.
   Qed.
@@ -201,7 +203,8 @@ End oneshot.
 
 (** Agreement maps *)
 Class agmapG Σ (A B : Type) `{Countable A} :=
-  AgMapG { agmapG_inG :> ghost_mapG Σ A B; }.
+  AgMapG { agmapG_inG : ghost_mapG Σ A B; }.
+#[export] Existing Instance agmapG_inG.
 Definition agmapΣ A B `{Countable A} : gFunctors := ghost_mapΣ A B.
 Global Instance subG_agmapΣ Σ A B `{Countable A} : subG (agmapΣ A B) Σ → agmapG Σ A B.
 Proof. solve_inG. Qed.

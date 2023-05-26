@@ -8,7 +8,17 @@ From semantics.pl.reloc Require Import ghost_state logrel.
 From iris.proofmode Require Import coq_tactics reduction spec_patterns.
 From iris.proofmode Require Export tactics.
 From semantics.pl.heap_lang Require Import primitive_laws.
+From iris.bi Require Import derived_laws.
+Import bi.
 From iris Require Import prelude.
+(*Import uPred.*)
+
+(*From iris.proofmode Require Import coq_tactics reduction spec_patterns.*)
+(*From iris.proofmode Require Export tactics.*)
+(*From iris.heap_lang Require Export tactics.*)
+(*From iris.heap_lang Require Import notation.*)
+(*From semantics.pl.heap_lang Require Export derived_laws.*)
+(*From semantics.pl.program_logic Require Export notation.*)
 
 
 Lemma tac_src_bind_gen `{relocGS Σ} Δ Δ' i p e e' Q :
@@ -69,7 +79,7 @@ Lemma src_expr_step_pure `{relocGS Σ} (ϕ : Prop) n e1 e2 K E :
   ϕ →
   PureExec ϕ n e1 e2 →
   ↑srcN ⊆ E →
-  src_expr (fill K e1) ={E}=∗ src_expr (fill K e2).
+  src_expr (fill K e1) ⊢ |={E}=> src_expr (fill K e2).
 Proof.
   iIntros (Hphi Hpure ?) "(#CTX & Hs)".
   iFrame "CTX". iApply src_step_pures; [ | done..]; done.
@@ -149,8 +159,8 @@ Tactic Notation "src_closure" := src_pure (Rec _ _ _).
 
 Lemma src_expr_step_store `{relocGS Σ} (v : val) (l : loc) v' K E :
   ↑srcN ⊆ E →
-  src_expr (fill K (#l <- v)) ∗ l ↦ₛ v' ={E}=∗
-  src_expr (fill K #()) ∗ l ↦ₛ v.
+  src_expr (fill K (#l <- v)) ∗ l ↦ₛ v' ⊢
+  |={E}=> src_expr (fill K #()) ∗ l ↦ₛ v.
 Proof.
   iIntros (?) "([#CTX Hs] & Hl)".
   iFrame "CTX". by iApply (src_step_store with "CTX Hs Hl").
@@ -203,8 +213,8 @@ Tactic Notation "src_store" :=
 
 Lemma src_expr_step_load `{relocGS Σ} (v : val) (l : loc) K E :
   ↑srcN ⊆ E →
-  src_expr (fill K (!#l)) ∗ l ↦ₛ v ={E}=∗
-  src_expr (fill K v) ∗ l ↦ₛ v.
+  src_expr (fill K (!#l)) ∗ l ↦ₛ v ⊢
+  |={E}=> src_expr (fill K v) ∗ l ↦ₛ v.
 Proof.
   iIntros (?) "([#CTX Hs] & Hl)".
   iFrame "CTX". by iApply (src_step_load with "CTX Hs Hl").
@@ -253,7 +263,8 @@ Tactic Notation "src_load" :=
 
 Lemma src_expr_step_alloc `{relocGS Σ} E K (v : val) :
   ↑srcN ⊆ E →
-  src_expr (fill K (ref v)) ={E}=∗ ∃ l : loc, src_expr (fill K (#l)) ∗ l ↦ₛ v.
+  src_expr (fill K (ref v)) ⊢
+  |={E}=> ∃ l : loc, src_expr (fill K (#l)) ∗ l ↦ₛ v.
 Proof.
   iIntros (?) "[#CTX Hs]".
   iFrame "CTX". by iApply (src_step_alloc with "CTX Hs").
