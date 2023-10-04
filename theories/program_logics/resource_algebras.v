@@ -675,9 +675,9 @@ Section sum.
         f_equiv. eauto using lra_pcore_l.
     - intros [a|b|] ? [= Ha]; subst; auto; rewrite csum_pcore in Ha.
       + destruct (pcore a) as [ca|] eqn:?; simplify_option_eq.
-        feed inversion (lra_pcore_idemp a ca); auto; rewrite csum_pcore; by simplify_option_eq.
+        oinversion (lra_pcore_idemp a ca); auto; rewrite csum_pcore; by simplify_option_eq.
       + destruct (pcore b) as [cb|] eqn:?; simplify_option_eq.
-        feed inversion (lra_pcore_idemp b cb); auto; rewrite csum_pcore; by simplify_option_eq.
+        oinversion (lra_pcore_idemp b cb); auto; rewrite csum_pcore; by simplify_option_eq.
     - intros x y ? [->|[(a&a'&->&->&?)|(b&b'&->&->&?)]]%csum_included [= Ha].
       + exists CsumBot. rewrite csum_included; eauto.
       + destruct (pcore a) as [ca|] eqn:?; rewrite csum_pcore; rewrite csum_pcore in Ha; simplify_option_eq.

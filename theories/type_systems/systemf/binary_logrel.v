@@ -1051,7 +1051,7 @@ Lemma sem_typing_ctx_equiv Δ Γ e1 e2 A :
 Proof.
   intros Hsem ? ? C Hty. eapply sem_typed_congruence in Hty; last done.
   all: try done.
-  feed pose proof (Hty ∅ ∅ δ_any) as He; first constructor.
+  opose proof* (Hty ∅ ∅ δ_any) as He; first constructor.
   revert He. rewrite !subst_map_empty.
   simp type_interp. destruct 1 as (v1 & v2 & Hbs1 & Hbs2 & Hv).
   simp type_interp in Hv. destruct Hv as (z & -> & ->). eauto.

@@ -68,10 +68,11 @@ Proof. apply mapsto_valid. Qed.
 Lemma mapsto_valid_2 l dq1 dq2 v1 v2 :
   l ↦{dq1} v1 -∗ l ↦{dq2} v2 -∗ ⌜✓ (dq1 ⋅ dq2) ∧ v1 = v2⌝.
 Proof.
-  iIntros "H1 H2". iDestruct (mapsto_valid_2 with "H1 H2") as %[? [=?]]. done.
+  iIntros "H1 H2". 
+  iDestruct (mapsto_valid_2 with "H1 H2") as %[? [=]]. done.
 Qed.
 Lemma mapsto_agree l dq1 dq2 v1 v2 : l ↦{dq1} v1 -∗ l ↦{dq2} v2 -∗ ⌜v1 = v2⌝.
-Proof. iIntros "H1 H2". iDestruct (mapsto_agree with "H1 H2") as %[=?]. done. Qed.
+Proof. iIntros "H1 H2". iDestruct (mapsto_agree with "H1 H2") as %[=]. done. Qed.
 
 Lemma mapsto_combine l dq1 dq2 v1 v2 :
   l ↦{dq1} v1 -∗ l ↦{dq2} v2 -∗ l ↦{dq1 ⋅ dq2} v1 ∗ ⌜v1 = v2⌝.
