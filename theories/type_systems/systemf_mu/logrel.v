@@ -105,12 +105,11 @@ Equations type_interp (c : type_case) (t : type) δ (k : nat) (v : match c with 
 
   type_interp val_case (A → B) δ k v =>
     ∃ x e, v = LamV x e ∧ is_closed (x :b: nil) e ∧
-      (* Slightly weird formulation: for down-closure, we want to quantify over all k' ≤ k --
-        but with that formulation, the termination checker will not be able to see that k' will really be smaller!
-         Thus, we quantify over the difference kd and subtract *)
-      ∀ v' kd,
-        type_interp val_case A δ (k - kd) v' →
-        type_interp expr_case B δ (k - kd) (subst' x (of_val v') e);
+      (* We write ∀ (H:k' ≤ k), .. instead of k' ≤ k → .. due to a longstanding Coq quirk, see
+         https://coq.zulipchat.com/#narrow/stream/237977-Coq-users/topic/.60Program.60.20and.20variable.20names/near/404824378 *)
+      ∀ v' k' (H:k' ≤ k),
+        type_interp val_case A δ k' v' →
+        type_interp expr_case B δ k' (subst' x (of_val v') e);
   type_interp val_case (#α) δ k v =>
     (δ α).(sem_type_car) k v;
   type_interp val_case (∀: A) δ k v =>
@@ -120,13 +119,10 @@ Equations type_interp (c : type_case) (t : type) δ (k : nat) (v : match c with 
     ∃ v', v = PackV v' ∧
       ∃ τ : sem_type, type_interp val_case A (τ .: δ) k v';
   (** Recursive type case *)
-  (** Defined with two cases: ordinarily, we might require [k > 0] in the body as a guard for the recursive call,
-     but this does not count as a proper guard for termination for Coq -- therefore we handle the 0-case separately.
+  (** By requiring k' < k, we implicitly encode that k > 0
    *)
-  type_interp val_case (μ: A) δ (S k) v =>
-    ∃ v', v = (roll v')%V ∧ is_closed [] v' ∧ ∀ kd, type_interp val_case (A.[μ: A/]%ty) δ (k - kd) v';
-  type_interp val_case (μ: A) δ 0 v =>
-    ∃ v', v = (roll v')%V ∧ is_closed [] v';
+  type_interp val_case (μ: A) δ k v =>
+    ∃ v', v = (roll v')%V ∧ is_closed [] v' ∧ ∀ k' (H:k' < k), type_interp val_case (A.[μ: A/]%ty) δ k' v';
 
   type_interp expr_case t δ k e =>
     ∀ e' n, n < k → red_nsteps n e e' → ∃ v, to_val e' = Some v ∧ type_interp val_case t δ (k - n) v
@@ -182,9 +178,7 @@ Proof.
   - intros (x & e & -> & ? & _). done.
   - intros (v1 & v2 & -> & ? & ?). simpl; apply andb_True; split; eauto.
   - intros [(v' & -> & ?) | (v' & -> & ?)]; simpl; eauto.
-  - destruct k; simp type_interp.
-    + intros (v' & -> & ?); done.
-    + intros (v' & -> & ? & Ha); done.
+  - intros (v' & -> & ? & Ha); done.
 Qed.
 
 
@@ -258,14 +252,8 @@ Proof.
     exists τ. eapply (IH (k, (A, _))); [ dsimpl | done..].
   - (* fun case *)
     destruct Hv as (x & e & -> & ? & Hv). exists x, e. split_and!; [done..| ].
-    intros v' kd Hv'.
-    (* slightly tricky due to the contravariant recursive occurrence *)
-    set (kd' := k - k').
-    specialize (Hv v' (kd + kd')).
-    replace (k - (kd + kd')) with (k' - kd) in Hv by lia.
-    eapply (IH (k' - kd, (B, expr_case))); [ | lia | by eapply Hv].
-    destruct (decide (k' - kd < k)) as [ ? | ?]; first (left; lia).
-    assert (k' - kd = k) as -> by lia. dsimpl.
+    intros v' k'' Hk'' Hv'.
+    apply Hv, Hv'. lia.
   - (* pair case *)
     destruct Hv as (v1 & v2 & -> & Hv1 & Hv2).
     exists v1, v2. split_and!; first done.
@@ -275,16 +263,9 @@ Proof.
     all: exists v'; split; first done.
     all: eapply (IH (k, (_, _))); [ dsimpl | done..].
   - (* rec case *)
-    destruct k; simp type_interp in Hv.
-    { assert (k' = 0) as -> by lia. simp type_interp. }
     destruct Hv as (v' & -> & ? & Hv).
-    destruct k' as [ | k']; simp type_interp.
-    { eauto. }
     exists v'. split_and!; [ done.. | ].
-    intros kd.
-    (* here we crucially use that we can decrease the index *)
-    eapply (IH (k - kd, (A.[(μ: A)%ty/], val_case))); [ | lia | done].
-    left. lia.
+    intros k'' Hk''. apply Hv. lia.
 Qed.
 
 (** We can now derive the two desired lemmas *)
@@ -402,15 +383,15 @@ Section boring_lemmas.
     - f_equiv. intros ?. f_equiv. intros ?.
       f_equiv. f_equiv. eapply forall_proper. intros ?.
       eapply forall_proper. intros ?.
+      eapply forall_proper. intros ?.
       eapply if_iff; by eapply (IH (_, (_, _))); first dsimpl.
     - f_equiv. intros ?. f_equiv. intros ?.
       f_equiv. f_equiv; by eapply (IH (_, (_, _))); first dsimpl.
     - f_equiv; f_equiv; intros ?; f_equiv; by eapply (IH (_, (_, _))); first dsimpl.
-    - destruct k; simp type_interp.
-      + done.
-      + f_equiv; intros ?. f_equiv. f_equiv.
-        eapply forall_proper; intros ?.
-        by eapply (IH (_, (_, _))); first dsimpl.
+    - f_equiv; intros ?. f_equiv. f_equiv.
+      eapply forall_proper; intros ?.
+      eapply forall_proper; intros ?.
+      by eapply (IH (_, (_, _))); first dsimpl.
   Qed.
 
 
@@ -440,17 +421,17 @@ Section boring_lemmas.
     - f_equiv. intros ?. f_equiv. intros ?.
       f_equiv. f_equiv. eapply forall_proper. intros ?.
       eapply forall_proper. intros ?.
+      eapply forall_proper. intros ?.
       eapply if_iff; by eapply (IH (_, (_, _))); first dsimpl.
     - f_equiv. intros ?. f_equiv. intros ?.
       f_equiv. f_equiv; by eapply (IH (_, (_, _))); first dsimpl.
     - f_equiv; f_equiv; intros ?; f_equiv; by eapply (IH (_, (_, _))); first dsimpl.
-    - destruct k; simp type_interp.
-      + done.
-      + f_equiv; intros ?. f_equiv. f_equiv.
-        eapply forall_proper; intros ?.
-        etransitivity; first eapply (IH (_, (_, _))); first dsimpl.
-        (* NOTE: nice use of asimpl; :-) *)
-        asimpl. done.
+    - f_equiv; intros ?. f_equiv. f_equiv.
+      eapply forall_proper; intros ?.
+      eapply forall_proper; intros ?.
+      etransitivity; first eapply (IH (_, (_, _))); first dsimpl.
+      (* NOTE: nice use of asimpl; :-) *)
+      asimpl. done.
   Qed.
 
 
@@ -488,17 +469,17 @@ Section boring_lemmas.
     - f_equiv. intros ?. f_equiv. intros ?.
       f_equiv. f_equiv. eapply forall_proper. intros ?.
       eapply forall_proper. intros ?.
+      eapply forall_proper. intros ?.
       eapply if_iff; by eapply (IH (_, (_, _))); first dsimpl.
     - f_equiv. intros ?. f_equiv. intros ?.
       f_equiv. f_equiv; by eapply (IH (_, (_, _))); first dsimpl.
     - f_equiv; f_equiv; intros ?; f_equiv; by eapply (IH (_, (_, _))); first dsimpl.
-    - destruct k; simp type_interp.
-      + done.
-      + f_equiv; intros ?. f_equiv. f_equiv.
-        eapply forall_proper; intros ?.
-        etransitivity; first eapply (IH (_, (_, _))); first dsimpl.
-        (* NOTE: nice use of asimpl; :-) *)
-        asimpl. done.
+    - f_equiv; intros ?. f_equiv. f_equiv.
+      eapply forall_proper; intros ?.
+      eapply forall_proper; intros ?.
+      etransitivity; first eapply (IH (_, (_, _))); first dsimpl.
+      (* NOTE: nice use of asimpl; :-) *)
+      asimpl. done.
   Qed.
 
 
@@ -636,8 +617,7 @@ Proof.
   intros j' f Hj' Hf.
 
   simp type_interp in Hf. destruct Hf as (x & e & -> & Hcl & Hf).
-  specialize (Hf v 0).
-  replace (j' - 0) with j' in Hf by lia.
+  specialize (Hf v j' (ltac:(lia))).
   eapply expr_det_step_closure.
   { eapply det_step_beta. apply is_val_of_val. }
   eapply expr_rel_mono; last apply Hf; first lia.
@@ -681,8 +661,8 @@ Proof.
     + eapply sem_context_rel_subset in Hctxt; naive_solver.
   }
 
-  intros v' kd Hv'.
-  specialize (Hbody (<[ x := of_val v']> θ) δ (k - kd)).
+  intros v' k' Hk' Hv'.
+  specialize (Hbody (<[ x := of_val v']> θ) δ k').
   simpl. rewrite subst_subst_map.
   2: { by eapply sem_context_rel_closed. }
   apply Hbody.
@@ -722,8 +702,8 @@ Proof.
     + eapply sem_context_rel_subset in Hctxt; naive_solver.
   }
 
-  intros v' kd Hv'.
-  apply (Hbody θ δ (k - kd)).
+  intros v' k' Hk' Hv'.
+  apply (Hbody θ δ k').
   eapply sem_context_rel_mono; last done. lia.
 Qed.
 
@@ -1005,9 +985,9 @@ Proof.
   eapply (sem_val_expr_rel _ _ _ (RollV v)).
 
   specialize (val_rel_is_closed _ _ _ _ Hv) as ?.
-  destruct j as [ | j]; simp type_interp; first by eauto.
+  simp type_interp.
   exists v. split_and!; [done.. | ].
-  intros kd. eapply val_rel_mono; last done. lia.
+  intros k' Hk'. eapply val_rel_mono; last done. lia.
 Qed.
 
 Lemma compat_unroll n Γ e A :
@@ -1023,7 +1003,7 @@ Proof.
   simp type_interp in Hv. destruct Hv as (v' & -> & ? & Hv).
   eapply expr_det_step_closure.
   { simpl. apply det_step_unroll. apply is_val_of_val. }
-  eapply sem_val_expr_rel. apply Hv.
+  eapply sem_val_expr_rel. apply Hv. lia.
 Qed.
 
 Local Hint Resolve compat_var compat_lam_named compat_lam_anon compat_tlam compat_int compat_bool compat_unit compat_if compat_app compat_tapp compat_pack compat_unpack compat_int_binop compat_int_bool_binop compat_unop compat_pair compat_fst compat_snd compat_injl compat_injr compat_case compat_roll compat_unroll: core.
@@ -1091,6 +1071,6 @@ Proof.
   simp type_interp in Hf. destruct Hf as (x & e & -> & Hcl & Hf).
   eapply expr_det_step_closure.
   { apply det_step_beta. apply is_val_of_val. }
-  apply Hf.
+  apply Hf; first lia.
   eapply val_rel_mono; last done. lia.
 Qed.

@@ -53,7 +53,7 @@ Proof.
   simp type_interp. eexists _, _. split; first done. split.
   - (* flip *)
     simp type_interp. eexists _, _. split; first done. split; first done.
-    intros v1 kd1 W3 Hincl2 Hv1. simpl.
+    intros v1 k1' W3 Hk1' Hincl2 Hv1. simpl.
     simp type_interp. intros e3 h3 h4 W4 n3 Hincl3 Hsat3 ? Hred.
     eapply (red_nsteps_fill [BinOpLCtx _ (LitV _);IfCtx _ _; IfCtx _ _; AppRCtx _]) in Hred as (n4 & e4 & h5 & ? & Hred_load & Hred).
     eapply (load_nsteps_inv' _ _ _ _ _ _ (λ v, v = #0 ∨ v = #1)) in Hred_load; [ | done | ].
@@ -101,7 +101,7 @@ Proof.
       all: rewrite insert_insert; subst INV; simpl; eauto.
   - (* get *)
     simp type_interp. eexists _, _. split; first done. split; first done.
-    intros v1 kd1 W3 Hincl2 Hv1. simpl.
+    intros v1 k'1 W3 Hk'1 Hincl2 Hv1. simpl.
     simp type_interp. intros e3 h3 h4 W4 n3 Hincl3 Hsat3 ? Hred.
     eapply (red_nsteps_fill [BinOpLCtx _ (LitV _);IfCtx _ _; IfCtx _ _; AppRCtx _]) in Hred as (n4 & e4 & h5 & ? & Hred_load & Hred).
     eapply (load_nsteps_inv' _ _ _ _ _ _ (λ v, v = #0 ∨ v = #1)) in Hred_load; [ | done | ].
