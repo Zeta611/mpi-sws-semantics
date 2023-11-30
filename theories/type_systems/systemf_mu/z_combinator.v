@@ -12,7 +12,7 @@ Proof.
   { apply (sem_expr_rel_of_val _ _ _ (LamV x e)). lia. }
   intros _. simp type_interp.
   eexists _, _; split_and!; [done | done | ].
-  intros v' kd _. assert (0 - kd = 0) as -> by lia.
+  intros v' kd Hlt _. assert (kd = 0) as -> by lia.
   (* NOTE: this crucially uses that the expression relation at zero is trivial *)
   apply sem_expr_rel_zero_trivial.
 Qed.
@@ -62,7 +62,7 @@ Proof.
 
   apply (sem_val_expr_rel _ _ _ (LamV _ _)).
   simp type_interp. eexists _, _. split_and!; [done |simplify_closed | ].
-  intros v' kd Hv'. simpl. fold g'.
+  intros v' k' Hk' Hv'. simpl. fold g'.
   eapply semantic_app; first last.
   { apply sem_val_expr_rel. done. }
 
@@ -82,7 +82,7 @@ Proof.
     simpl. eapply is_closed_weaken; first done.
     simplify_list_subseteq.
   }
-  intros v2 kd2 Hv2.
+  intros v2 k'' Hk'' Hv2.
 
   set (θ'' := (<[ "x" := of_val v2 ]> $ <["f" := (λ: "x", g' g' "x")]> $ θ)%E).
   replace (subst' "x" _ _) with (subst_map θ'' e).
@@ -104,7 +104,7 @@ Proof.
   apply (sem_context_rel_insert _ _ _ _ (LamV _ _)).
   { eapply sem_expr_rel_lambda_val; first by simplify_closed.
     destruct k.
-    { simpl. replace (0 - kd2) with 0 by lia. apply sem_expr_rel_zero_trivial. }
+    { simpl. replace (k'') with 0 by lia. apply sem_expr_rel_zero_trivial. }
     eapply IH. lia.
     eapply sem_context_rel_mono; last done. lia.
   }
@@ -139,7 +139,7 @@ Proof.
   apply (sem_val_expr_rel _ _ _ (LamV _ _)).
 
   simp type_interp. eexists _, _. split_and!; [done |simplify_closed | ].
-  intros v' kd Hv'. simpl.
+  intros v' k' Hk'' Hv'. simpl.
   eapply semantic_app; first last.
   { apply sem_val_expr_rel. done. }
   simpl. rewrite subst_is_closed_nil; last done.
@@ -151,9 +151,8 @@ Proof.
   }
 
   (* Factor this into a separate lemma ? *)
-  clear Hv' v' HF. generalize (k - kd) => k0.
-  clear kd.
-  induction k0 as [ k0 IH] using lt_wf_ind.
+  clear Hv' v' HF.
+  induction k' as [ k0 IH] using lt_wf_ind.
 
   eapply expr_det_steps_closure.
   { do_det_step. simpl. econstructor. }
@@ -161,16 +160,17 @@ Proof.
 
   simp type_interp. eexists _, _. split_and!; [done | | ].
   { done. }
-  intros vF kd2 Hv2. simpl.
+  intros vF k'3 Hk'3 Hv2. simpl.
   generalize Hv2 => HF.
 
   simp type_interp in Hv2.
   destruct Hv2 as (x & e & -> & ? & Hv2).
   eapply expr_det_steps_closure. { do_det_step. econstructor. }
   eapply (Hv2 (LamV _ _)).
+  { lia. }
 
   simp type_interp. eexists _, _. split_and!; [done |simplify_closed | ].
-  intros v' kd Hv'. simpl.
+  intros v' k'4 Hk'4 Hv'. simpl.
   eapply semantic_app; first last.
   { apply sem_val_expr_rel. done. }
   simpl.
@@ -185,7 +185,7 @@ Proof.
     eapply val_rel_mono; last done. lia.
   }
   destruct k0 as [ | k0]; last (eapply IH; lia).
-  simpl. rewrite Nat.sub_0_l.
+  replace k'4 with 0 by lia.
   eapply sem_expr_rel_zero_trivial.
 Qed.
 

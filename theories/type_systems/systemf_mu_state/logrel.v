@@ -495,12 +495,11 @@ Equations type_interp (c : type_case) (t : type) δ (k : nat) (W : world) (v : m
 
   type_interp val_case (A → B) δ k W v =>
     ∃ x e, v = LamV x e ∧ is_closed (x :b: nil) e ∧
-      (* Slightly weird formulation: for down-closure, we want to quantify over all k' ≤ k --
-        but with that formulation, the termination checker will not be able to see that k' will really be smaller!
-         Thus, we quantify over the difference kd and subtract *)
-      ∀ v' kd W', W' ⊒ W →
-        type_interp val_case A δ (k - kd) W' v' →
-        type_interp expr_case B δ (k - kd) W' (subst' x (of_val v') e);
+      (* We write ∀ (H:k' ≤ k), .. instead of k' ≤ k → .. due to a longstanding Coq quirk, see
+         https://coq.zulipchat.com/#narrow/stream/237977-Coq-users/topic/.60Program.60.20and.20variable.20names/near/404824378 *)
+      ∀ v' k' W' (Hk' : k' ≤ k), W' ⊒ W →
+        type_interp val_case A δ k' W' v' →
+        type_interp expr_case B δ k' W' (subst' x (of_val v') e);
   type_interp val_case (#α) δ k W v =>
     (δ α).(sem_type_car) k W v;
   type_interp val_case (∀: A) δ k W v =>
@@ -509,13 +508,10 @@ Equations type_interp (c : type_case) (t : type) δ (k : nat) (W : world) (v : m
   type_interp val_case (∃: A) δ k W v =>
     ∃ v', v = PackV v' ∧
       ∃ τ : sem_type, type_interp val_case A (τ .: δ) k W v';
-  (** Defined with two cases: ordinarily, we might require [k > 0] in the body as a guard for the recursive call,
-     but this does not count as a proper guard for termination for Coq -- therefore we handle the 0-case separately.
+  (** By requiring k' < k, we implicitly encode that k > 0
    *)
-  type_interp val_case (μ: A) δ (S k) W v =>
-    ∃ v', v = (roll v')%V ∧ is_closed [] v' ∧ ∀ kd, type_interp val_case (A.[μ: A/]%ty) δ (k - kd) W v';
-  type_interp val_case (μ: A) δ 0 W v =>
-    ∃ v', v = (roll v')%V ∧ is_closed [] v';
+  type_interp val_case (μ: A) δ k W v =>
+    ∃ v', v = (roll v')%V ∧ is_closed [] v' ∧ ∀ k' (H : k' < k), type_interp val_case (A.[μ: A/]%ty) δ k' W v';
   (** The reference case *)
   type_interp val_case (Ref a) δ k W v =>
       ∃ (l : loc), v = LitV $ LitLoc l ∧ ∃ i INV, W !! i = Some INV ∧
@@ -576,9 +572,7 @@ Proof.
   - intros (x & e & -> & ? & _). done.
   - intros (v1 & v2 & -> & ? & ?). simpl; apply andb_True; split; eauto.
   - intros [(v' & -> & ?) | (v' & -> & ?)]; simpl; eauto.
-  - destruct k; simp type_interp.
-    + intros (v' & -> & ?); done.
-    + intros (v' & -> & ? & Ha); done.
+  - intros (v' & -> & ? & Ha); done.
   - intros (l & -> & _). done.
 Qed.
 
@@ -609,14 +603,12 @@ Proof.
     exists τ. eapply (IH (k, (A, _))); [ dsimpl | done..].
   - (* fun case *)
     destruct Hv as (x & e & -> & ? & Hv). exists x, e. split_and!; [done..| ].
-    intros v' kd W' Hv' Hincl.
+    intros v' k'' W' Hk'' Hv' Hincl.
     (* slightly tricky due to the contravariant recursive occurrence *)
-    set (kd' := k - k').
-    specialize (Hv v' (kd + kd')).
-    replace (k - (kd + kd')) with (k' - kd) in Hv by lia.
-    eapply (IH (k' - kd, (B, expr_case))); [ | lia | by eapply Hv].
-    destruct (decide (k' - kd < k)) as [ ? | ?]; first (left; lia).
-    assert (k' - kd = k) as -> by lia. dsimpl.
+    specialize (Hv v' k'').
+    eapply (IH (k'', (B, expr_case))); [ | lia | eapply Hv; [lia|done..] ].
+    destruct (decide (k'' < k)) as [ ? | ?]; first (left; lia).
+    replace k'' with k by lia. dsimpl.
   - (* pair case *)
     destruct Hv as (v1 & v2 & -> & Hv1 & Hv2).
     exists v1, v2. split_and!; first done.
@@ -626,16 +618,11 @@ Proof.
     all: exists v'; split; first done.
     all: eapply (IH (k, (_, _))); [ dsimpl | done..].
   - (* rec case *)
-    destruct k; simp type_interp in Hv.
-    { assert (k' = 0) as -> by lia. simp type_interp. }
     destruct Hv as (v' & -> & ? & Hv).
-    destruct k' as [ | k']; simp type_interp.
-    { eauto. }
     exists v'. split_and!; [ done.. | ].
-    intros kd.
+    intros k'' Hk'.
     (* here we crucially use that we can decrease the index *)
-    eapply (IH (k - kd, (A.[(μ: A)%ty/], val_case))); [ | lia | done].
-    left. lia.
+    eapply (IH (k'', (A.[(μ: A)%ty/], val_case))); [left | | apply Hv]; lia.
 Qed.
 
 (** We can now derive the two desired lemmas *)
@@ -671,12 +658,13 @@ Proof.
     exists τ. eapply (IH (k, (A, _))); [ dsimpl | done..].
   - (* fun case *)
     destruct Hv as (x & e & -> & ? & Hv). exists x, e. split_and!; [done..| ].
-    intros v' kd W'' Hincl Hv'.
-    specialize (Hv v' kd W'').
-    eapply (IH (k - kd, (B, expr_case))); [ dsimpl | | eapply Hv].
+    intros v' k' W'' Hk' Hincl Hv'.
+    specialize (Hv v' k' W'').
+    eapply (IH (k', (B, expr_case))); [ dsimpl | | eapply Hv].
     + done.
+    + lia.
     + etrans; done.
-    + eapply (IH (k -kd, (A, val_case))); last done; last done. dsimpl.
+    + eapply (IH (k', (A, val_case))); last done; last done. dsimpl.
   - (* pair case *)
     destruct Hv as (v1 & v2 & -> & Hv1 & Hv2).
     exists v1, v2. split_and!; first done.
@@ -686,15 +674,11 @@ Proof.
     all: exists v'; split; first done.
     all: eapply (IH (k, (_, _))); [ dsimpl | done..].
   - (* rec case *)
-    destruct k; simp type_interp in Hv.
-    { simp type_interp. }
     destruct Hv as (v' & -> & ? & Hv).
-    simp type_interp.
     exists v'. split_and!; [ done.. | ].
-    intros kd.
+    intros k' Hk'.
     (* here we crucially use that we can decrease the index *)
-    eapply (IH (k - kd, (A.[(μ: A)%ty/], val_case))); [ | done | done].
-    left. lia.
+    eapply (IH (k', (A.[(μ: A)%ty/], val_case))); [left | done | apply Hv]; lia.
   - (* loc case *)
     destruct Hv as (l & -> & (i & INV & Hlook & Heq)).
     exists l. split; first done.
@@ -856,19 +840,19 @@ Section boring_lemmas.
       intros [|m] ?; simpl; eauto.
     - f_equiv. intros ?. f_equiv. intros ?.
       f_equiv. f_equiv. eapply forall_proper. intros ?.
-      eapply forall_proper. intros ?.
+      eapply forall_proper. intros k'.
       eapply forall_proper. intros W'.
+      eapply forall_proper. intros ?.
       eapply if_iff'; intros.
       eapply if_iff; (eapply (IH (_, (_, _))); first dsimpl).
       all: intros; eapply Hd; etrans; done.
     - f_equiv. intros ?. f_equiv. intros ?.
       f_equiv. f_equiv; by eapply (IH (_, (_, _))); first dsimpl.
     - f_equiv; f_equiv; intros ?; f_equiv; by eapply (IH (_, (_, _))); first dsimpl.
-    - destruct k; simp type_interp.
-      + done.
-      + f_equiv; intros ?. f_equiv. f_equiv.
-        eapply forall_proper; intros ?.
-        by eapply (IH (_, (_, _))); first dsimpl.
+    - f_equiv; intros ?. f_equiv. f_equiv.
+      eapply forall_proper; intros k'.
+      eapply forall_proper; intros ?.
+      by eapply (IH (_, (_, _))); first dsimpl.
   Qed.
 
   Lemma type_interp_move_ren :
@@ -900,17 +884,15 @@ Section boring_lemmas.
       intros [|m] ?; simpl; eauto.
     - f_equiv. intros ?. f_equiv. intros ?.
       f_equiv. f_equiv. eapply forall_proper. intros ?.
-      eapply forall_proper. intros ?. eapply forall_proper. intros ?.
+      do 3 (eapply forall_proper; intros ?).
       eapply if_iff; first done. eapply if_iff; by eapply (IH (_, (_, _))); first dsimpl.
     - f_equiv. intros ?. f_equiv. intros ?.
       f_equiv. f_equiv; by eapply (IH (_, (_, _))); first dsimpl.
     - f_equiv; f_equiv; intros ?; f_equiv; by eapply (IH (_, (_, _))); first dsimpl.
-    - destruct k; simp type_interp.
-      + done.
-      + f_equiv; intros ?. f_equiv. f_equiv.
-        eapply forall_proper; intros ?.
-        etransitivity; first eapply (IH (_, (_, _))); first dsimpl.
-        asimpl. done.
+    - f_equiv; intros ?. f_equiv. f_equiv.
+      do 2 (eapply forall_proper; intros ?).
+      etransitivity; first eapply (IH (_, (_, _))); first dsimpl.
+      asimpl. done.
   Qed.
 
   Lemma type_interp_move_subst  :
@@ -950,18 +932,15 @@ Section boring_lemmas.
         done.
     - f_equiv. intros ?. f_equiv. intros ?.
       f_equiv. f_equiv. eapply forall_proper. intros ?.
-      eapply forall_proper. intros ?. eapply forall_proper. intros W'.
-      eapply if_iff; first done.
-      eapply if_iff; by eapply (IH (_, (_, _))); first dsimpl.
+      do 3 (eapply forall_proper; intros ?).
+      eapply if_iff; first done. eapply if_iff; by eapply (IH (_, (_, _))); first dsimpl.
     - f_equiv. intros ?. f_equiv. intros ?.
       f_equiv. f_equiv; by eapply (IH (_, (_, _))); first dsimpl.
     - f_equiv; f_equiv; intros ?; f_equiv; by eapply (IH (_, (_, _))); first dsimpl.
-    - destruct k; simp type_interp.
-      + done.
-      + f_equiv; intros ?. f_equiv. f_equiv.
-        eapply forall_proper; intros ?.
-        etransitivity; first eapply (IH (_, (_, _))); first dsimpl.
-        asimpl. done.
+    - f_equiv; intros ?. f_equiv. f_equiv.
+      do 2 (eapply forall_proper; intros ?).
+      etransitivity; first eapply (IH (_, (_, _))); first dsimpl.
+      asimpl. done.
   Qed.
 
 
@@ -1103,11 +1082,10 @@ Proof.
   intros j' f W'' Hj' HW' Hf.
 
   simp type_interp in Hf. destruct Hf as (x & e & -> & Hcl & Hf).
-  specialize (Hf v 0).
-  replace (j' - 0) with j' in Hf by lia.
+  specialize (Hf v j').
   eapply expr_det_step_closure.
   { eapply det_step_beta. apply is_val_of_val. }
-  eapply expr_rel_mono_idx; last apply Hf; [lia | reflexivity | ].
+  eapply expr_rel_mono_idx; last apply Hf; [ lia | lia | reflexivity | ].
   eapply val_rel_mono; last done; [lia | done].
 Qed.
 
@@ -1148,8 +1126,8 @@ Proof.
     + eapply sem_context_rel_subset in Hctxt; naive_solver.
   }
 
-  intros v' kd W' Hv' Hincl.
-  specialize (Hbody (<[ x := of_val v']> θ) δ (k - kd) W').
+  intros v' k' W' Hk' Hv' Hincl.
+  specialize (Hbody (<[ x := of_val v']> θ) δ k' W').
   simpl. rewrite subst_subst_map.
   2: { by eapply sem_context_rel_closed. }
   apply Hbody.
@@ -1189,8 +1167,8 @@ Proof.
     + eapply sem_context_rel_subset in Hctxt; naive_solver.
   }
 
-  intros v' kd W' Hv' Hincl.
-  apply (Hbody θ δ (k - kd) W').
+  intros v' k' W' Hk' Hv' Hincl.
+  apply (Hbody θ δ k' W').
   eapply sem_context_rel_mono; [ | done..]. lia.
 Qed.
 
@@ -1478,7 +1456,7 @@ Proof.
     intros j' v W'' Hj' HW' Hv. simpl.
     simp type_interp in Hv. destruct Hv as (x & e' & -> & ? & Hv).
     eapply expr_det_step_closure. { apply det_step_beta. apply is_val_of_val. }
-    apply Hv; first done. eapply val_rel_mono; last done; [lia | done].
+    apply Hv; [lia | done | ]. eapply val_rel_mono; last done; [lia | done].
   - simpl. eapply expr_det_step_closure.
     { apply det_step_caser. apply is_val_of_val. }
     eapply (bind [AppLCtx _]).
@@ -1486,7 +1464,7 @@ Proof.
     intros j' v W'' Hj' HW' Hv. simpl.
     simp type_interp in Hv. destruct Hv as (x & e' & -> & ? & Hv).
     eapply expr_det_step_closure. { apply det_step_beta. apply is_val_of_val. }
-    apply Hv; first done. eapply val_rel_mono; last done; [lia | done].
+    apply Hv; [lia | done | ]. eapply val_rel_mono; last done; [lia | done].
 Qed.
 
 Lemma compat_roll n Γ e A :
@@ -1501,9 +1479,9 @@ Proof.
   eapply (sem_val_expr_rel _ _ _ _ (RollV v)).
 
   specialize (val_rel_is_closed _ _ _ _ _ Hv) as ?.
-  destruct j as [ | j]; simp type_interp; first by eauto.
+  simp type_interp.
   exists v. split_and!; [done.. | ].
-  intros kd. eapply val_rel_mono_idx; last done. lia.
+  intros k' Hk'. eapply val_rel_mono_idx; last done. lia.
 Qed.
 
 Lemma compat_unroll n Γ e A :
@@ -1515,11 +1493,12 @@ Proof.
 
   eapply (bind [UnrollCtx]); first done.
   intros j v W' Hj HW Hv.
-  destruct j as [ | j]; first by apply sem_expr_rel_zero_trivial.
   simp type_interp in Hv. destruct Hv as (v' & -> & ? & Hv).
   eapply expr_det_step_closure.
   { simpl. apply det_step_unroll. apply is_val_of_val. }
-  eapply sem_val_expr_rel. apply Hv.
+  destruct j as [|j].
+  + apply sem_expr_rel_zero_trivial.
+  + eapply sem_val_expr_rel, Hv. lia.
 Qed.
 
 
@@ -1754,6 +1733,6 @@ Proof.
   simp type_interp in Hf. destruct Hf as (x & e & -> & Hcl & Hf).
   eapply expr_det_step_closure.
   { apply det_step_beta. apply is_val_of_val. }
-  apply Hf; first done.
+  apply Hf; [lia | done | ].
   eapply val_rel_mono; [ | done..]. lia.
 Qed.
