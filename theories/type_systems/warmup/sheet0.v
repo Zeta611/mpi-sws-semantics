@@ -18,20 +18,28 @@ Inductive expr :=
 
  (** Exercise 1: Arithmetics *)
  Fixpoint expr_eval (e : expr) : Z :=
-  (* TODO: write the function *)
-  0.
+  match e with
+  | Const z => z
+  | Plus e1 e2 => expr_eval e1 + expr_eval e2
+  | Mul e1 e2 => expr_eval e1 * expr_eval e2
+  end.
 
  Lemma expr_eval_test: expr_eval (Plus (Const (-4)) (Const 5)) = 1%Z.
  Proof.
-    (* Should be solved by: simpl. lia. *)
- Admitted.
+   easy.
+ Qed.
 
  Lemma plus_eval_comm e1 e2 :
    expr_eval (Plus e1 e2) = expr_eval (Plus e2 e1).
- Proof. Admitted.
+ Proof.
+   simpl. lia.
+ Qed.
+
  Lemma plus_syntax_not_comm :
    Plus (Const 0) (Const 1) ≠ Plus (Const 1) (Const 0).
- Proof. Admitted.
+ Proof.
+   easy.
+ Qed.
 
  (** Exercise 2: Arithmetics Structural Semantics *)
 
@@ -54,13 +62,14 @@ Inductive expr :=
  Lemma no_step_const z e' :
    step (Const z) e' → False.
  Proof.
- Admitted.
+   easy.
+ Qed.
 
  Lemma step_deterministic e e' e'' :
    step e e' → step e e'' → e' = e''.
  Proof.
    intros Hstep1 Hstep2.
-   induction Hstep1 as [ ??? H IH | ??? H IH | | ??? H IH | ??? H IH | ] in e'', Hstep2 |-*.
+   induction Hstep1 as [ ??? H IH | ??? H IH | | ??? H IH | ??? H IH | ] in e'', Hstep2.
    { inversion Hstep2; subst.
      + f_equal. by apply IH.
      + exfalso; by eapply no_step_const.
@@ -92,6 +101,8 @@ Inductive expr :=
  Check (5 + 5)%Z.
  Check (5 + 5).
 
+ Ltac econs := econstructor; eauto.
+
  (** Exercise 3: Reflexive-transitive closure *)
  Section rtc.
   Context {X : Type}.
@@ -101,12 +112,22 @@ Inductive expr :=
      | rtc_step x y z : R x y → rtc R y z → rtc R x z.
 
    Lemma rtc_reflexive R : Reflexive (rtc R).
-   Proof. unfold Reflexive. Admitted.
+   Proof.
+     unfold Reflexive.
+     econs.
+   Qed.
    Lemma rtc_transitive R : Transitive (rtc R).
-   Proof. unfold Transitive. Admitted.
+   Proof.
+     unfold Transitive.
+     intros x y z H1 H2.
+     induction H1; eauto.
+     econs.
+   Qed.
 
    Lemma rtc_subrel (R: X → X → Prop) (x y : X): R x y → rtc R x y.
-   Proof. Admitted.
+   Proof.
+     econs. econs.
+   Qed.
 
    Section typeclass.
      (* We can use Coq's typeclass mechanism to enable the use of the [transitivity] and [reflexivity] tactics on our goals.
@@ -152,15 +173,28 @@ End stdpp.
 (* Prove the following lemmas. *)
 Lemma plus_right e1 e2 e2':
  rtc step e2 e2' → rtc step (Plus e1 e2) (Plus e1 e2').
-Proof. Admitted.
+Proof.
+  intro.
+  induction H; econs.
+Qed.
 
 Lemma plus_left e1 e1' n:
  rtc step e1 e1' → rtc step (Plus e1 (Const n)) (Plus e1' (Const n)).
-Proof. Admitted.
+Proof.
+  intro.
+  induction H; econs.
+Qed.
 
 Lemma plus_to_consts e1 e2 n m:
  rtc step e1 (Const n) → rtc step e2 (Const m) → rtc step (e1 + e2)%E (Const (n + m)%Z).
-Proof. Admitted.
+Proof.
+  intros.
+  transitivity (e1 + Const m)%E.
+  - auto using plus_right.
+  - transitivity (Const n + Const m)%E.
+    + auto using plus_left.
+    + econs. easy.
+Qed.
 
 
 (** Exercise 4: Open arithmetical expressions *)
@@ -213,12 +247,21 @@ Proof.
   unfold closed. intros Hsub; induction e; simpl.
   - (* bool_decide is an stdpp function, which can be used to decide simple decidable propositions.
        Make a search for it to find the right lemmas to complete this subgoal. *)
-    admit.
+  (* Search (bool_decide _). *)
+    intro.
+    rewrite bool_decide_eq_true in *. auto.
   - done.
   - (* Locate the notation for && by typing: Locate "&&". Then search for the right lemmas.*)
-    admit.
-  - admit.
-Admitted.
+    intro.
+    (* Search (_ && _ = true). *)
+    rewrite andb_true_iff in *.
+    destruct H.
+    split; auto.
+  - intro.
+    rewrite andb_true_iff in *.
+    destruct H.
+    split; auto.
+Qed.
 
 (* we define a substitution operation on open expressions *)
 Fixpoint subst (e: expr') (x: string) (e': expr') : expr' :=
@@ -231,8 +274,22 @@ Fixpoint subst (e: expr') (x: string) (e': expr') : expr' :=
 
 Lemma subst_closed e e' x X:
   closed X e → ¬ (x ∈ X) → subst e x e' = e.
-Proof. Admitted.
-
+Proof.
+  intros.
+  induction e; eauto.
+  - simpl.
+    inversion H. clear H.
+    apply bool_decide_eq_true in H2.
+    assert (bool_decide (x = x0) = false).
+    { apply bool_decide_eq_false. intro. subst. done. }
+    rewrite H. done.
+  - simpl.
+    inversion H. clear H. apply andb_true_iff in H2. destruct H2.
+    rewrite IHe1, IHe2; done.
+  - simpl.
+    inversion H. clear H. apply andb_true_iff in H2. destruct H2.
+    rewrite IHe1, IHe2; done.
+Qed.
 
 (* To evaluate an arithmetic expression, we define an evaluation function [expr_eval], which maps them to integers.
    Since our expressions contain variables, we pass a finite map as the argument, which is used to look up variables.
@@ -249,5 +306,15 @@ Fixpoint expr_eval' (m: gmap string Z) (e : expr') : Z :=
 (* Prove the following lemma which explains how substitution interacts with evaluation *)
 Lemma eval_subst_extend (m: gmap string Z) e x e':
   expr_eval' m (subst e x e') = expr_eval' (<[x := expr_eval' m e']> m) e.
-Proof. Admitted.
-
+Proof.
+  induction e; eauto.
+  - simpl.
+    destruct (bool_decide (x = x0)) eqn:E.
+    + apply bool_decide_eq_true in E. subst.
+      (* Search (<[_ := _]> _ !! _). *)
+      rewrite lookup_insert. auto.
+    + apply bool_decide_eq_false in E. subst.
+      rewrite lookup_insert_ne; auto.
+  - simpl. rewrite IHe1, IHe2. done.
+  - simpl. rewrite IHe1, IHe2. done.
+Qed.
